@@ -1,5 +1,6 @@
 // Updated: Move controls to tab row and remove redundant title
-import { useMemo, useState, useEffect } from 'react';
+// Fixed: Added mount logging, AbortController, debounced search, and effect guards
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { Plus, Search, Edit3 } from 'lucide-react';
 import TableCard from '../../components/TableCard.jsx';
 import EditModal from '../../components/EditModal.jsx';
@@ -44,6 +45,7 @@ function SkeletonRow() {
 export default function Items() {
   const { toast } = useApp();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(0);
   const [editing, setEditing] = useState(null);
@@ -51,33 +53,102 @@ export default function Items() {
   const [error, setError] = useState(null);
   const [importOpen, setImportOpen] = useState(false);
   const pageSize = 10;
+  
+  // Refs for effect guards and abort controller
+  const abortControllerRef = useRef(null);
+  const prevFiltersRef = useRef({ search: '', category: '' });
+  const debounceTimerRef = useRef(null);
 
-  // Simulate data loading
+  // Mount/unmount logging for debugging
   useEffect(() => {
+    console.debug('[Inventory/Items] mounted');
+    return () => {
+      console.debug('[Inventory/Items] unmounted');
+      // Cleanup: abort any pending requests
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Debounce search input (250ms)
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(0); // Reset to first page on search change
+    }, 250);
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [search]);
+
+  // Simulate data loading with AbortController
+  useEffect(() => {
+    // Cancel previous request if still pending
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+    
+    setLoading(true);
     const timer = setTimeout(() => {
       try {
-        // Mock API call
-        setLoading(false);
-        setError(null);
+        if (!signal.aborted) {
+          setLoading(false);
+          setError(null);
+        }
       } catch (err) {
-        setError('Failed to load inventory items');
-        setLoading(false);
+        if (!signal.aborted) {
+          setError('Failed to load inventory items');
+          setLoading(false);
+        }
       }
     }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    
+    return () => {
+      clearTimeout(timer);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []); // Only run on mount/unmount
 
   const items = useMemo(() => allItems || [], []);
   
+  // Filter with effect guard to prevent unnecessary recalculations
   const filtered = useMemo(() => {
-    return items.filter((r) =>
+    const currentFilters = { search: debouncedSearch, category };
+    const filtersChanged = 
+      prevFiltersRef.current.search !== debouncedSearch ||
+      prevFiltersRef.current.category !== category;
+    
+    if (!filtersChanged && prevFiltersRef.current.items === items) {
+      return prevFiltersRef.current.filtered || [];
+    }
+    
+    prevFiltersRef.current = { search: debouncedSearch, category, items };
+    
+    const result = items.filter((r) =>
       (!category || r.category === category) && (
-        search === '' ||
-        (r.sku || '').toLowerCase().includes(search.toLowerCase()) ||
-        (r.name || '').toLowerCase().includes(search.toLowerCase())
+        debouncedSearch === '' ||
+        (r.sku || '').toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        (r.name || '').toLowerCase().includes(debouncedSearch.toLowerCase())
       )
     );
-  }, [search, category, items]);
+    
+    prevFiltersRef.current.filtered = result;
+    return result;
+  }, [debouncedSearch, category, items]);
 
   const start = page * pageSize;
   const paged = filtered.slice(start, start + pageSize);
@@ -146,7 +217,7 @@ export default function Items() {
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
-            setPage(0);
+            // Page reset handled by debounce effect
           }}
         />
       </div>
@@ -159,7 +230,7 @@ export default function Items() {
         onImport={() => setImportOpen(true)}
       />
     </>
-  ), [search, category, items, toast, handleExportCallback]);
+  ), [search, category, items, toast, handleExportCallback, setPage]);
   
   usePageControls(controls);
 

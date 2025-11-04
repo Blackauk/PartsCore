@@ -29,6 +29,7 @@ export default function Catalog() {
   
   // Filters
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedEquipment, setSelectedEquipment] = useState([]);
   const [stockFilter, setStockFilter] = useState('all'); // all, in_stock, low_stock, out_of_stock
   const [viewMode, setViewMode] = useState('table'); // table, cards
@@ -43,19 +44,68 @@ export default function Catalog() {
   const [itemDrawerSku, setItemDrawerSku] = useState(null);
   
   const pageSize = 20;
+  
+  // Refs for effect guards and abort controller
+  const abortControllerRef = useRef(null);
+  const prevFiltersRef = useRef({ search: '', selectedEquipment: [], stockFilter: 'all' });
+  const debounceTimerRef = useRef(null);
+
+  // Mount/unmount logging for debugging
+  useEffect(() => {
+    console.debug('[Inventory/Catalog] mounted');
+    return () => {
+      console.debug('[Inventory/Catalog] unmounted');
+      // Cleanup: abort any pending requests
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Debounce search input (250ms)
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(0); // Reset to first page on search change
+    }, 250);
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [search]);
 
   // Merge catalog with stock
   const catalogWithStock = useMemo(() => {
     return mergeCatalogueWithStock(catalogueItems, stockStatus);
   }, []);
 
-  // Apply filters
+  // Apply filters with effect guard to prevent unnecessary recalculations
   const filtered = useMemo(() => {
+    const currentFilters = { search: debouncedSearch, selectedEquipment, stockFilter };
+    const filtersChanged = 
+      prevFiltersRef.current.search !== debouncedSearch ||
+      prevFiltersRef.current.selectedEquipment.length !== selectedEquipment.length ||
+      prevFiltersRef.current.selectedEquipment.some((eq, i) => selectedEquipment[i] !== eq) ||
+      prevFiltersRef.current.stockFilter !== stockFilter;
+    
+    if (!filtersChanged && prevFiltersRef.current.catalogWithStock === catalogWithStock) {
+      return prevFiltersRef.current.filtered || [];
+    }
+    
+    prevFiltersRef.current = { ...currentFilters, catalogWithStock };
+    
     let result = catalogWithStock;
     
     // Search filter
-    if (search) {
-      const lower = search.toLowerCase();
+    if (debouncedSearch) {
+      const lower = debouncedSearch.toLowerCase();
       result = result.filter(item => 
         item.sku.toLowerCase().includes(lower) ||
         item.name?.toLowerCase().includes(lower) ||
@@ -80,8 +130,9 @@ export default function Catalog() {
       });
     }
     
+    prevFiltersRef.current.filtered = result;
     return result;
-  }, [search, selectedEquipment, stockFilter, catalogWithStock]);
+  }, [debouncedSearch, selectedEquipment, stockFilter, catalogWithStock]);
 
   // Pagination
   const start = page * pageSize;
@@ -238,7 +289,7 @@ export default function Catalog() {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                setPage(0);
+                // Page reset handled by debounce effect
               }}
             />
           </div>

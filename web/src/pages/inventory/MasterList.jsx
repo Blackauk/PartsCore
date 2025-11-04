@@ -1,9 +1,10 @@
 // Root cause: TabbedLayout didn't render <Outlet/>, so child pages never mounted. Data was also not safely defaulted.
 // Fix: Added <Outlet/> to TabbedLayout. Added safe array defaults.
 // Updated: Reordered columns and replaced QR button with Manage dropdown menu.
+// Fixed: Added mount logging, AbortController, and effect guards
 
 // Updated: Move FilterBar controls to tab row and remove redundant title
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { masterItems, suppliersList, categoriesList, sitesList, zonesBySiteMap, landmarksBySiteMap } from '../../data/mockInventory.js';
 import FilterBar from '../../components/FilterBar.jsx';
 import TableCard from '../../components/TableCard.jsx';
@@ -27,6 +28,22 @@ export default function MasterList() {
   const [viewingItem, setViewingItem] = useState(null);
   const [minMaxItem, setMinMaxItem] = useState(null);
   const [sort, setSort] = useState({ key: 'articleNumber', dir: 'asc' });
+  
+  // Refs for effect guards and abort controller
+  const abortControllerRef = useRef(null);
+  const prevFiltersRef = useRef({});
+
+  // Mount/unmount logging for debugging
+  useEffect(() => {
+    console.debug('[Inventory/MasterList] mounted');
+    return () => {
+      console.debug('[Inventory/MasterList] unmounted');
+      // Cleanup: abort any pending requests
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   // Safe defaults
   const items = Array.isArray(masterItems) ? masterItems : [];
@@ -36,9 +53,18 @@ export default function MasterList() {
   const zones = zonesBySiteMap || {};
   const landmarks = landmarksBySiteMap || {};
 
+  // Filter with effect guard to prevent unnecessary recalculations
   const filtered = useMemo(() => {
+    const filtersChanged = JSON.stringify(prevFiltersRef.current) !== JSON.stringify(filters);
+    
+    if (!filtersChanged && prevFiltersRef.current.items === items) {
+      return prevFiltersRef.current.filtered || [];
+    }
+    
+    prevFiltersRef.current = { ...filters, items };
+    
     const q = (filters.sku || '').toLowerCase();
-    return items.filter((it) => {
+    const result = items.filter((it) => {
       if (filters.supplier && it.supplier !== filters.supplier) return false;
       if (filters.category && it.category !== filters.category) return false;
       if (filters.site && it.site !== filters.site) return false;
@@ -55,7 +81,10 @@ export default function MasterList() {
       const res = String(ka).localeCompare(String(kb));
       return sort.dir === 'asc' ? res : -res;
     });
-  }, [filters, sort]);
+    
+    prevFiltersRef.current.filtered = result;
+    return result;
+  }, [filters, sort, items]);
 
   function exportFiltered() {
     // Export headers in the new column order

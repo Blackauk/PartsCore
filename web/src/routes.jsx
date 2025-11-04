@@ -29,7 +29,6 @@ import Catalog from './pages/inventory/Catalog.jsx';
 import LowStock from './pages/inventory/LowStock.jsx';
 import FastMovers from './pages/inventory/FastMovers.jsx';
 import MasterList from './pages/inventory/MasterList.jsx';
-import Stock from './pages/inventory/Stock.jsx';
 
 // Locations sub-pages
 import SitesPage from './pages/locations/Sites.jsx';
@@ -95,15 +94,14 @@ export default function AppRoutes() {
 
                   <Route path="/inventory" element={<Inventory />}>
                     <Route index element={<Navigate to="/inventory/master-list" replace />} />
-                    <Route path="master-list" element={<MasterList />} />
+                    <Route path="master-list" element={<MasterList key="master-list" />} />
                     <Route path="master" element={<Navigate to="/inventory/master-list" replace />} />
-                    <Route path="items" element={<Items />} />
-                    <Route path="catalog" element={<Catalog />} />
-                    <Route path="stock" element={<Stock />} />
-                    <Route path="low-stock" element={<LowStock />} />
-                    <Route path="fast-movers" element={<FastMovers />} />
+                    <Route path="items" element={<Items key="items" />} />
+                    <Route path="catalog" element={<Catalog key="catalog" />} />
+                    <Route path="low-stock" element={<LowStock key="low-stock" />} />
+                    <Route path="fast-movers" element={<FastMovers key="fast-movers" />} />
                     <Route path="movements" element={<Navigate to="/movements" replace />} />
-                    <Route path="history" element={<History />} />
+                    <Route path="history" element={<History key="history" />} />
                   </Route>
                   
                   <Route path="/catalog/items/:sku" element={<ItemDetail />} />
