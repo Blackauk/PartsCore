@@ -9,9 +9,10 @@ import { AuthProvider as LegacyAuthProvider } from './contexts/AuthContext.jsx'
 import { AuthProvider } from './auth/AuthContext.jsx'
 import { bootstrapDataLayer } from './lib/data-migration.js'
 
-// Router toggle: HashRouter for production (GitHub Pages), BrowserRouter for dev
-// Set VITE_USE_HASH=1 in production build, VITE_USE_HASH=0 for development
-const useHash = import.meta.env.VITE_USE_HASH === '1'
+// Router toggle: HashRouter for GitHub Pages, BrowserRouter for dev
+// Detect GitHub Pages hostname OR use VITE_USE_HASH env var
+const isGitHubPages = typeof window !== 'undefined' && window.location.host.endsWith('github.io')
+const useHash = isGitHubPages || import.meta.env.VITE_USE_HASH === '1'
 const RouterImpl = useHash ? HashRouter : BrowserRouter
 
 // Only use basename with BrowserRouter (HashRouter doesn't need it)

@@ -134,6 +134,29 @@ export async function register({ name, email, password }) {
  * @returns {Promise<{id: string, name: string, email: string, roles: string[], permissions: string[], siteIds?: string[]}>}
  */
 export async function getMe() {
+  // Detect GitHub Pages host
+  const isGitHubPages = typeof window !== 'undefined' && window.location.host.endsWith('github.io');
+  
+  // Mock user for GitHub Pages (no backend)
+  if (isGitHubPages) {
+    const mockUser = JSON.parse(localStorage.getItem('mockUser') || 'null') || {
+      id: 'demo-001',
+      name: 'Demo Admin',
+      email: 'demo@corestock.local',
+      roles: ['admin'],
+      permissions: [
+        'inventory.read', 'inventory.write', 'inventory.adjust',
+        'procurement.read', 'procurement.receive', 'procurement.create',
+        'labels.generate', 'labels.print',
+        'reports.read',
+        'users.admin', 'roles.admin', 'sites.admin'
+      ],
+      siteIds: []
+    };
+    localStorage.setItem('mockUser', JSON.stringify(mockUser));
+    return mockUser;
+  }
+  
   const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
   
   // Handle mock auth in development

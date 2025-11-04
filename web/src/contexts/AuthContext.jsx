@@ -18,6 +18,7 @@ export function AuthProvider({ children }) {
   const refresh = useCallback(async () => {
     try {
       setStatus('loading');
+      // getMe() now handles GitHub Pages mock user internally
       const userData = await getMe();
       setUser({
         id: userData.id,
@@ -29,6 +30,24 @@ export function AuthProvider({ children }) {
       setPermissions(userData.permissions || []);
       setStatus('authenticated');
     } catch (error) {
+      // On GitHub Pages, getMe() should never throw (returns mock user)
+      // But if it does, check for mockUser in localStorage as fallback
+      const isGitHubPages = typeof window !== 'undefined' && window.location.host.endsWith('github.io');
+      if (isGitHubPages) {
+        const mockUser = JSON.parse(localStorage.getItem('mockUser') || 'null');
+        if (mockUser) {
+          setUser({
+            id: mockUser.id,
+            name: mockUser.name,
+            email: mockUser.email,
+            siteIds: mockUser.siteIds || [],
+          });
+          setRoles(mockUser.roles || []);
+          setPermissions(mockUser.permissions || []);
+          setStatus('authenticated');
+          return;
+        }
+      }
       setUser(null);
       setRoles([]);
       setPermissions([]);

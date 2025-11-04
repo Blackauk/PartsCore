@@ -47,7 +47,26 @@ export default function LoginPage() {
 
   // Auto-bypass on GH Pages or when env flag is set
   useEffect(() => {
-    if (bypassAuth) {
+    const isGitHubPages = typeof window !== 'undefined' && window.location.host.endsWith('github.io');
+    if (bypassAuth || isGitHubPages) {
+      // On GitHub Pages, also ensure mock user is set for legacy auth
+      if (isGitHubPages) {
+        const mockUser = {
+          id: 'demo-001',
+          name: 'Demo Admin',
+          email: 'demo@corestock.local',
+          roles: ['admin'],
+          permissions: [
+            'inventory.read', 'inventory.write', 'inventory.adjust',
+            'procurement.read', 'procurement.receive', 'procurement.create',
+            'labels.generate', 'labels.print',
+            'reports.read',
+            'users.admin', 'roles.admin', 'sites.admin'
+          ],
+          siteIds: []
+        };
+        localStorage.setItem('mockUser', JSON.stringify(mockUser));
+      }
       login();
       navigate('/', { replace: true });
     }
