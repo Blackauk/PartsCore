@@ -99,7 +99,7 @@ export default function PODetail() {
         </div>
         <div className="card p-8 text-center">
           <h2 className="text-xl font-semibold mb-2">PO Not Found</h2>
-          <p className="text-zinc-400">The purchase order {poId} could not be found.</p>
+          <p className="text-secondary">The purchase order {poId} could not be found.</p>
         </div>
       </div>
     );
@@ -116,9 +116,9 @@ export default function PODetail() {
               Back
             </button>
           </div>
-          <div className="text-xs text-zinc-400 mt-2">Purchase Order</div>
+          <div className="text-xs text-secondary mt-2">Purchase Order</div>
           <h1 className="text-xl font-semibold">{po.id}</h1>
-          <div className="text-sm text-zinc-400">
+          <div className="text-sm text-secondary">
             Supplier: {po.supplier} · Site: {po.site}
           </div>
         </div>
@@ -153,21 +153,21 @@ export default function PODetail() {
               <div><span className="font-medium">Site:</span> {po.site}</div>
             </div>
           </div>
-          <div className="grid md:grid-cols-4 gap-4 pt-4 border-t border-zinc-800">
+          <div className="grid md:grid-cols-4 gap-4 pt-4 border-t border-base">
             <div>
-              <div className="text-xs text-zinc-400 mb-1">Order Date</div>
+              <div className="text-xs text-secondary mb-1">Order Date</div>
               <div className="font-medium">{po.orderDate}</div>
             </div>
             <div>
-              <div className="text-xs text-zinc-400 mb-1">Expected Date</div>
+              <div className="text-xs text-secondary mb-1">Expected Date</div>
               <div className="font-medium">{po.expectedDate}</div>
             </div>
             <div>
-              <div className="text-xs text-zinc-400 mb-1">Status</div>
+              <div className="text-xs text-secondary mb-1">Status</div>
               <div className="font-medium">{po.status}</div>
             </div>
             <div>
-              <div className="text-xs text-zinc-400 mb-1">Total Value</div>
+              <div className="text-xs text-secondary mb-1">Total Value</div>
               <div className="font-medium">{formatCurrency(po.lines?.reduce((sum, l) => sum + (l.lineTotal || l.qty * (l.unitPrice || 0)), 0) || 0, settings.currency)}</div>
             </div>
           </div>
@@ -175,15 +175,15 @@ export default function PODetail() {
 
         {/* Line Items */}
         <div className="card p-0 overflow-hidden">
-          <div className="p-4 border-b border-zinc-800">
+          <div className="p-4 border-b border-base">
             <h3 className="text-sm font-semibold">Line Items</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-zinc-900">
+              <thead className="bg-elevated">
                 <tr>
                   {columns.filter(c => c.key !== 'lineNo').map((col) => (
-                    <th key={col.key} className="px-4 py-2 text-left text-xs font-medium text-zinc-400 border-b border-zinc-800">
+                    <th key={col.key} className="px-4 py-2 text-left text-xs font-medium text-secondary border-b border-base">
                       {col.label}
                     </th>
                   ))}
@@ -191,7 +191,7 @@ export default function PODetail() {
               </thead>
               <tbody>
                 {po.lines?.map((line, idx) => (
-                  <tr key={idx} className="border-b border-zinc-800 last:border-0">
+                  <tr key={idx} className="border-b border-base last:border-0">
                     {columns.filter(c => c.key !== 'lineNo').map((col) => (
                       <td key={col.key} className="px-4 py-2 text-sm">
                         {col.render ? col.render(line) : line[col.key]}
@@ -211,12 +211,12 @@ export default function PODetail() {
           <h3 className="text-sm font-medium mb-2">Attachments</h3>
           <div className="space-y-2">
             {attachments.map((att) => (
-              <div key={att.id} className="flex items-center justify-between p-2 bg-zinc-900 rounded border border-zinc-800">
+              <div key={att.id} className="flex items-center justify-between p-2 bg-elevated rounded border border-base">
                 <div className="flex items-center gap-2">
-                  <FileText size={16} className="text-zinc-400" />
+                  <FileText size={16} className="text-secondary" />
                   <div>
                     <div className="text-sm">{att.name}</div>
-                    <div className="text-xs text-zinc-500">
+                    <div className="text-xs text-muted">
                       {(att.size / 1024).toFixed(1)} KB · {att.uploadedBy} · {new Date(att.uploadedAt).toLocaleString()}
                     </div>
                   </div>

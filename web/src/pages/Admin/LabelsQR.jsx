@@ -282,7 +282,7 @@ export default function LabelsQR() {
             <QrCode className="text-[#F7931E]" size={28} />
             Labels & QR
           </h1>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-secondary">
             Generate, preview, and export QR-coded labels for parts, purchase orders, and storage locations.
           </p>
         </div>
@@ -296,7 +296,7 @@ export default function LabelsQR() {
       </div>
       
       {/* Tab Navigation */}
-      <div className="flex gap-2 border-b border-zinc-800">
+      <div className="flex gap-2 border-b border-base">
         <button
           onClick={() => {
             setActiveTab('parts');
@@ -305,8 +305,8 @@ export default function LabelsQR() {
           }}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'parts'
-              ? 'border-[#F7931E] text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
+              ? 'border-brand text-primary'
+              : 'border-transparent text-secondary hover:text-primary'
           }`}
         >
           <Package size={16} className="inline mr-2" />
@@ -320,8 +320,8 @@ export default function LabelsQR() {
           }}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'po'
-              ? 'border-[#F7931E] text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
+              ? 'border-brand text-primary'
+              : 'border-transparent text-secondary hover:text-primary'
           }`}
         >
           <ShoppingCart size={16} className="inline mr-2" />
@@ -335,8 +335,8 @@ export default function LabelsQR() {
           }}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'location'
-              ? 'border-[#F7931E] text-white'
-              : 'border-transparent text-zinc-400 hover:text-white'
+              ? 'border-brand text-primary'
+              : 'border-transparent text-secondary hover:text-primary'
           }`}
         >
           <MapPin size={16} className="inline mr-2" />
@@ -349,13 +349,13 @@ export default function LabelsQR() {
         <div className="space-y-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary h-4 w-4 pointer-events-none" />
             <input
               type="text"
               placeholder={`Search ${activeTab === 'parts' ? 'SKU / Article' : activeTab === 'po' ? 'PO Number' : 'Location'}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 text-sm rounded-lg border border-zinc-800 bg-zinc-900 focus:ring-2 focus:ring-[#F7931E]/50 focus:outline-none"
+              className="input w-full pl-10"
             />
           </div>
           
@@ -402,7 +402,7 @@ export default function LabelsQR() {
             {activeTab === 'parts' && filteredParts.length > 0 && (
               <>
                 {selectedItems.length > 0 && (
-                  <div className="text-xs text-zinc-400 mb-2">
+                  <div className="text-xs text-secondary mb-2">
                     {selectedItems.length} selected
                   </div>
                 )}
@@ -418,14 +418,14 @@ export default function LabelsQR() {
                           ? 'bg-[#F7931E]/20 border-[#F7931E]/30'
                           : isSelected
                           ? 'bg-blue-900/20 border-blue-700/30'
-                          : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                          : 'bg-elevated border-base hover:border-base'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="font-medium text-sm">{item.sku}</div>
-                          <div className="text-xs text-zinc-400">{item.articleName}</div>
-                          <div className="text-xs text-zinc-500">{item.site} • {item.zone}</div>
+                          <div className="text-xs text-secondary">{item.articleName}</div>
+                          <div className="text-xs text-muted">{item.site} • {item.zone}</div>
                         </div>
                         {isSelected && (
                           <div className="text-[#F7931E]">✓</div>
@@ -453,12 +453,12 @@ export default function LabelsQR() {
                   className={`w-full text-left p-3 rounded-lg border transition-colors ${
                     selectedPO?.id === po.id
                       ? 'bg-[#F7931E]/20 border-[#F7931E]/30'
-                      : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                      : 'bg-elevated border-base hover:border-base'
                   }`}
                 >
                   <div className="font-medium text-sm">{po.id}</div>
-                  <div className="text-xs text-zinc-400">{po.supplier}</div>
-                  <div className="text-xs text-zinc-500">{po.site} • {po.lines.length} line(s)</div>
+                  <div className="text-xs text-secondary">{po.supplier}</div>
+                  <div className="text-xs text-muted">{po.site} • {po.lines.length} line(s)</div>
                 </button>
               ))
             )}
@@ -479,19 +479,19 @@ export default function LabelsQR() {
                   className={`w-full text-left p-3 rounded-lg border transition-colors ${
                     selectedLocation?.code === loc.code
                       ? 'bg-[#F7931E]/20 border-[#F7931E]/30'
-                      : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                      : 'bg-elevated border-base hover:border-base'
                   }`}
                 >
                   <div className="font-medium text-sm">{loc.code}</div>
-                  <div className="text-xs text-zinc-400">{loc.site}</div>
-                  <div className="text-xs text-zinc-500">{loc.zone} • {loc.landmark}</div>
+                  <div className="text-xs text-secondary">{loc.site}</div>
+                  <div className="text-xs text-muted">{loc.zone} • {loc.landmark}</div>
                 </button>
               ))
             )}
             {((activeTab === 'parts' && filteredParts.length === 0) ||
               (activeTab === 'po' && filteredPOs.length === 0) ||
               (activeTab === 'location' && filteredLocations.length === 0)) && (
-              <div className="text-center text-zinc-500 py-8 text-sm">
+              <div className="text-center text-muted py-8 text-sm">
                 No results found
               </div>
             )}
@@ -537,7 +537,7 @@ export default function LabelsQR() {
                 />
               </div>
             ) : (
-              <div className="card p-8 text-center text-zinc-500 text-sm">
+              <div className="card p-8 text-center text-muted text-sm">
                 Select an item to preview
               </div>
             )}
@@ -552,28 +552,28 @@ export default function LabelsQR() {
               </h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="text-left border-b border-zinc-800">
+                  <thead className="text-left border-b border-base">
                     <tr>
-                      <th className="pb-2 text-zinc-400 font-medium">Date</th>
-                      <th className="pb-2 text-zinc-400 font-medium">Type</th>
-                      <th className="pb-2 text-zinc-400 font-medium">Items</th>
-                      <th className="pb-2 text-zinc-400 font-medium">Format</th>
-                      <th className="pb-2 text-zinc-400 font-medium">Action</th>
+                      <th className="pb-2 text-secondary font-medium">Date</th>
+                      <th className="pb-2 text-secondary font-medium">Type</th>
+                      <th className="pb-2 text-secondary font-medium">Items</th>
+                      <th className="pb-2 text-secondary font-medium">Format</th>
+                      <th className="pb-2 text-secondary font-medium">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentExports.slice(0, 5).map((exp) => (
-                      <tr key={exp.id} className="border-b border-zinc-800/50">
-                        <td className="py-2 text-zinc-300">
+                      <tr key={exp.id} className="border-b border-base">
+                        <td className="py-2 text-primary">
                           {new Date(exp.date).toLocaleDateString()}
                         </td>
                         <td className="py-2">
-                          <span className="px-2 py-0.5 bg-zinc-800 rounded text-[10px]">
+                          <span className="px-2 py-0.5 bg-elevated rounded text-[10px] text-secondary">
                             {exp.type}
                           </span>
                         </td>
-                        <td className="py-2 text-zinc-300">{exp.count}</td>
-                        <td className="py-2 text-zinc-400">{exp.format}</td>
+                        <td className="py-2 text-primary">{exp.count}</td>
+                        <td className="py-2 text-secondary">{exp.format}</td>
                         <td className="py-2">
                           <button
                             onClick={async () => {

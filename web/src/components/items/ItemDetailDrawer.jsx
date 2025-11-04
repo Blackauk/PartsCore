@@ -180,13 +180,13 @@ export default function ItemDetailDrawer({
       <div className="fixed inset-0 z-[80] bg-black/50" onClick={onClose} />
       
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-zinc-900 border-l border-zinc-800 shadow-2xl z-[90] overflow-y-auto">
+      <div className="fixed right-0 top-0 h-full w-full max-w-2xl bg-panel border-l border-base shadow-2xl z-[90] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-start justify-between">
+        <div className="sticky top-0 bg-panel border-b border-base px-6 py-4 flex items-start justify-between">
           <div className="flex-1">
-            <h2 className="text-lg font-semibold">{item.sku}</h2>
-            <div className="text-sm text-zinc-400 mt-1">{item.name || item.description || item.partNumber}</div>
-            <div className="flex items-center gap-4 mt-2 text-xs text-zinc-500">
+            <h2 className="text-lg font-semibold text-primary">{item.sku}</h2>
+            <div className="text-sm text-secondary mt-1">{item.name || item.description || item.partNumber}</div>
+            <div className="flex items-center gap-4 mt-2 text-xs text-muted">
               <span>Part No: {item.partNumber || '—'}</span>
               {item.oemPartNumber && (
                 <span className="flex items-center gap-1">
@@ -206,7 +206,7 @@ export default function ItemDetailDrawer({
         </div>
 
         {/* Tabs */}
-        <div className="sticky top-[73px] bg-zinc-900 border-b border-zinc-800 px-6 z-10">
+        <div className="sticky top-[73px] bg-panel border-b border-base px-6 z-10">
           <div className="flex gap-2 overflow-x-auto">
             {['overview', 'stock', 'alternatives', 'suppliers', 'attachments', 'history'].map((tab) => (
               <button
@@ -214,8 +214,8 @@ export default function ItemDetailDrawer({
                 onClick={() => setActiveTab(tab)}
                 className={`px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   activeTab === tab
-                    ? 'text-white border-blue-500'
-                    : 'text-zinc-400 border-transparent hover:text-white hover:border-zinc-700'
+                    ? 'text-primary border-brand'
+                    : 'text-secondary border-transparent hover:text-primary hover:border-base'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -231,7 +231,7 @@ export default function ItemDetailDrawer({
             <div className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 {Array.isArray(item.equipment) && item.equipment.map(eq => (
-                  <span key={eq} className="px-2 py-1 bg-zinc-800 rounded text-xs">
+                  <span key={eq} className="px-2 py-1 bg-elevated rounded text-xs text-secondary">
                     {eq}
                   </span>
                 ))}
@@ -239,7 +239,7 @@ export default function ItemDetailDrawer({
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-xs text-zinc-400">Status</div>
+                  <div className="text-xs text-secondary">Status</div>
                   <div className="mt-1">
                     <span className={`px-2 py-0.5 rounded text-xs ${statusColor}`}>
                       {status === 'in_stock' ? 'In Stock' : status === 'low_stock' ? 'Low Stock' : 'Out of Stock'}
@@ -247,29 +247,29 @@ export default function ItemDetailDrawer({
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-zinc-400">Lead Time</div>
+                  <div className="text-xs text-secondary">Lead Time</div>
                   <div className="mt-1 font-medium">{item.leadTimeDays || item.leadTime || 0} days</div>
                 </div>
                 <div>
-                  <div className="text-xs text-zinc-400">Min / Max</div>
+                  <div className="text-xs text-secondary">Min / Max</div>
                   <div className="mt-1 font-medium">{item.minQty || 0} / {item.maxQty || '—'}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-zinc-400">Unit</div>
+                  <div className="text-xs text-secondary">Unit</div>
                   <div className="mt-1 font-medium">{item.unit || 'pcs'}</div>
                 </div>
               </div>
 
               {item.descriptionLong && (
                 <div>
-                  <div className="text-xs text-zinc-400 mb-1">Description</div>
+                  <div className="text-xs text-secondary mb-1">Description</div>
                   <div className="mt-1 text-sm whitespace-pre-wrap">{item.descriptionLong}</div>
                 </div>
               )}
 
               {item.specs && (
                 <div>
-                  <div className="text-xs text-zinc-400 mb-1">Specifications</div>
+                  <div className="text-xs text-secondary mb-1">Specifications</div>
                   <div className="mt-1 text-sm whitespace-pre-wrap">{item.specs}</div>
                 </div>
               )}
@@ -286,15 +286,15 @@ export default function ItemDetailDrawer({
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="card p-3 text-center">
-                  <div className="text-xs text-zinc-400">On Hand</div>
+                  <div className="text-xs text-secondary">On Hand</div>
                   <div className="text-2xl font-semibold mt-1">{item.onHand || stock?.onHand || 0}</div>
                 </div>
                 <div className="card p-3 text-center">
-                  <div className="text-xs text-zinc-400">On Order</div>
+                  <div className="text-xs text-secondary">On Order</div>
                   <div className="text-2xl font-semibold mt-1">{item.onOrder || stock?.onOrder || 0}</div>
                 </div>
                 <div className="card p-3 text-center">
-                  <div className="text-xs text-zinc-400">Reserved</div>
+                  <div className="text-xs text-secondary">Reserved</div>
                   <div className="text-2xl font-semibold mt-1">{item.reserved || stock?.reserved || 0}</div>
                 </div>
               </div>
@@ -306,20 +306,20 @@ export default function ItemDetailDrawer({
                   <div className="text-sm font-medium mb-2">Locations</div>
                   <div className="card p-0 overflow-hidden">
                     <table className="w-full">
-                      <thead className="bg-zinc-800">
+                      <thead className="bg-elevated">
                         <tr>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Site</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Zone</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Bin</th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Qty</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Site</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Zone</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Bin</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Qty</th>
                         </tr>
                       </thead>
                       <tbody>
                         {stock.locations.map((loc, idx) => (
-                          <tr key={idx} className="border-t border-zinc-800 hover:bg-zinc-800/30">
+                          <tr key={idx} className="border-t border-base hover:bg-elevated">
                             <td className="px-3 py-2 text-sm">{loc.site}</td>
-                            <td className="px-3 py-2 text-sm text-zinc-400">{loc.zone || '—'}</td>
-                            <td className="px-3 py-2 text-sm text-zinc-400">{loc.bin || '—'}</td>
+                            <td className="px-3 py-2 text-sm text-secondary">{loc.zone || '—'}</td>
+                            <td className="px-3 py-2 text-sm text-secondary">{loc.bin || '—'}</td>
                             <td className="px-3 py-2 text-sm">{loc.qty}</td>
                           </tr>
                         ))}
@@ -328,7 +328,7 @@ export default function ItemDetailDrawer({
                   </div>
                 </div>
               ) : (
-                <div className="text-center text-zinc-500 py-8 text-sm">No location data available</div>
+                <div className="text-center text-muted py-8 text-sm">No location data available</div>
               )}
             </div>
           )}
@@ -347,13 +347,13 @@ export default function ItemDetailDrawer({
                         <div className="text-sm font-medium mb-2 capitalize">{relationType.replace('_', ' ')}</div>
                         <div className="card p-0 overflow-hidden">
                           <table className="w-full">
-                            <thead className="bg-zinc-800">
+                            <thead className="bg-elevated">
                               <tr>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">SKU</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Name</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Status</th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Supplier</th>
-                                <th className="px-3 py-2 text-center text-xs font-medium text-zinc-300"></th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-secondary">SKU</th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Name</th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Status</th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Supplier</th>
+                                <th className="px-3 py-2 text-center text-xs font-medium text-secondary"></th>
                               </tr>
                             </thead>
                             <tbody>
@@ -361,7 +361,7 @@ export default function ItemDetailDrawer({
                                 const altStatus = getStockStatus(0, 0);
                                 const altColor = getStockStatusColor(altStatus);
                                 return (
-                                  <tr key={rel.toSku} className="border-t border-zinc-800 hover:bg-zinc-800/30">
+                                  <tr key={rel.toSku} className="border-t border-base hover:bg-elevated">
                                     <td className="px-3 py-2 text-sm font-mono">{rel.toSku}</td>
                                     <td className="px-3 py-2 text-sm">—</td>
                                     <td className="px-3 py-2">
@@ -369,7 +369,7 @@ export default function ItemDetailDrawer({
                                         Unknown
                                       </span>
                                     </td>
-                                    <td className="px-3 py-2 text-sm text-zinc-400">—</td>
+                                    <td className="px-3 py-2 text-sm text-secondary">—</td>
                                     <td className="px-3 py-2 text-center">
                                       <button className="btn-secondary text-xs px-2 py-1">
                                         <Plus size={12} />
@@ -387,8 +387,8 @@ export default function ItemDetailDrawer({
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Package className="mx-auto text-zinc-500 mb-3" size={48} />
-                  <div className="text-zinc-400 text-sm mb-3">No alternatives linked</div>
+                  <Package className="mx-auto text-muted mb-3" size={48} />
+                  <div className="text-secondary text-sm mb-3">No alternatives linked</div>
                   <button className="btn-secondary">
                     <Plus size={14} />
                     Link Alternative
@@ -402,7 +402,7 @@ export default function ItemDetailDrawer({
           {activeTab === 'suppliers' && (
             <div className="space-y-4">
               <div className="card p-0 overflow-hidden">
-                <div className="p-3 bg-zinc-800 flex items-center justify-between border-b border-zinc-700">
+                <div className="p-3 bg-elevated flex items-center justify-between border-b border-base">
                   <div className="text-sm font-medium">Supplier List</div>
                   <button className="btn-secondary text-xs px-2 py-1">
                     <Plus size={12} />
@@ -411,31 +411,31 @@ export default function ItemDetailDrawer({
                 </div>
                 {suppliers.length > 0 ? (
                   <table className="w-full">
-                    <thead className="bg-zinc-800">
+                    <thead className="bg-elevated">
                       <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Preferred</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Supplier</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Lead Time</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Last Price</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-zinc-300">Notes</th>
-                        <th className="px-3 py-2 text-center text-xs font-medium text-zinc-300"></th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Preferred</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Supplier</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Lead Time</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Last Price</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-secondary">Notes</th>
+                        <th className="px-3 py-2 text-center text-xs font-medium text-secondary"></th>
                       </tr>
                     </thead>
                     <tbody>
                       {suppliers.map((sup, idx) => (
-                        <tr key={idx} className="border-t border-zinc-800 hover:bg-zinc-800/30">
+                        <tr key={idx} className="border-t border-base hover:bg-elevated">
                           <td className="px-3 py-2">
                             <button 
                               onClick={() => handleTogglePreferred(sup.supplierId)}
                               className="p-1 hover:text-yellow-400"
                             >
-                              <Star size={16} className={sup.isPreferred ? 'text-yellow-400 fill-yellow-400' : 'text-zinc-500'} />
+                              <Star size={16} className={sup.isPreferred ? 'text-yellow-400 fill-yellow-400' : 'text-muted'} />
                             </button>
                           </td>
                           <td className="px-3 py-2 text-sm font-mono">{sup.supplierId}</td>
                           <td className="px-3 py-2 text-sm">{sup.leadTimeDays || '—'}d</td>
                           <td className="px-3 py-2 text-sm">{sup.lastPrice ? formatCurrency(sup.lastPrice, settings.currency) : '—'}</td>
-                          <td className="px-3 py-2 text-sm text-zinc-400 max-w-xs truncate">{sup.notes || '—'}</td>
+                          <td className="px-3 py-2 text-sm text-secondary max-w-xs truncate">{sup.notes || '—'}</td>
                           <td className="px-3 py-2 text-center">
                             <button className="btn-secondary text-xs px-2 py-1">
                               <Trash2 size={12} />
@@ -446,7 +446,7 @@ export default function ItemDetailDrawer({
                     </tbody>
                   </table>
                 ) : (
-                  <div className="text-center text-zinc-500 py-8 text-sm">No suppliers added yet</div>
+                  <div className="text-center text-muted py-8 text-sm">No suppliers added yet</div>
                 )}
               </div>
             </div>
@@ -468,7 +468,7 @@ export default function ItemDetailDrawer({
                         <FileText size={20} className="text-blue-400" />
                         <div>
                           <div className="text-sm font-medium">{att.name}</div>
-                          <div className="text-xs text-zinc-500">
+                          <div className="text-xs text-muted">
                             {(att.size / 1024).toFixed(1)} KB · {att.uploadedBy} · {new Date(att.uploadedAt).toLocaleDateString()}
                           </div>
                         </div>
@@ -516,13 +516,13 @@ export default function ItemDetailDrawer({
                             )}
                           </div>
                           {entry.ref && (
-                            <div className="text-xs text-zinc-400 mb-1">Ref: {entry.ref}</div>
+                            <div className="text-xs text-secondary mb-1">Ref: {entry.ref}</div>
                           )}
                           {entry.note && (
                             <div className="text-sm">{entry.note}</div>
                           )}
                         </div>
-                        <div className="text-right text-xs text-zinc-500">
+                        <div className="text-right text-xs text-muted">
                           <div>{new Date(entry.date).toLocaleDateString()}</div>
                           <div>{new Date(entry.date).toLocaleTimeString()}</div>
                           <div className="mt-1">{entry.user}</div>
@@ -532,14 +532,14 @@ export default function ItemDetailDrawer({
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-zinc-500 py-12 text-sm">No history yet</div>
+                <div className="text-center text-muted py-12 text-sm">No history yet</div>
               )}
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-zinc-900 border-t border-zinc-800 px-6 py-4 flex gap-2">
+        <div className="sticky bottom-0 bg-panel border-t border-base px-6 py-4 flex gap-2">
           <button onClick={handleAddToBatch} className="btn-secondary flex-1 text-sm">
             <ShoppingCart size={14} />
             Add to Batch
