@@ -1,0 +1,1 @@
+const a=[{id:"p1",partNo:"BRG-6005",description:"Ball Bearing 6005",supplierId:"s1",uom:"EA",min:2,max:20,leadTimeDays:5,lastCost:12.5,tags:["bearing"],status:"active"}];export{a as default};
