@@ -55,7 +55,7 @@ export function getSidebarNav(user) {
     },
     {
       label: 'Labels & QR',
-      path: '/labels-qr',
+      path: '/labels',
       icon: 'Printer',
       perm: ['labels.generate', 'labels.print']
     },

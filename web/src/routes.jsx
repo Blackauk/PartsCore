@@ -56,7 +56,7 @@ import TeamsSites from './pages/admin/TeamsSites.jsx';
 import PermissionsMatrix from './pages/admin/PermissionsMatrix.jsx';
 import Integrations from './pages/admin/Integrations.jsx';
 import AuditLog from './pages/admin/AuditLog.jsx';
-import LabelsQR from './pages/admin/LabelsQR.jsx';
+import LabelsQR from './pages/Admin/LabelsQR.jsx';
 import Settings from './pages/Settings.jsx';
 import HelpCenter from './pages/HelpCenter.jsx';
 import Feedback from './pages/Feedback.jsx';
@@ -139,10 +139,12 @@ export default function AppRoutes() {
                     <Route path="teams" element={<TeamsSites />} />
                     <Route path="permissions" element={<PermissionsMatrix />} />
                     <Route path="settings" element={<Settings />} />
-                    <Route path="labels" element={<LabelsQR />} />
                     <Route path="integrations" element={<Integrations />} />
                     <Route path="audit" element={<AuditLog />} />
                   </Route>
+
+                  {/* Labels & QR - standalone page */}
+                  <Route path="/labels" element={<LabelsQR />} />
 
                   <Route path="/help" element={<HelpCenter />} />
                   <Route path="/help-centre" element={<HelpCenter />} />
@@ -152,12 +154,10 @@ export default function AppRoutes() {
                   <Route path="/manage" element={<Navigate to="/admin" replace />} />
                   <Route path="/manage/*" element={<Navigate to="/admin" replace />} />
                   
-                  {/* Redirect /labels-qr to /admin/labels */}
-                  <Route path="/labels-qr" element={<Navigate to="/admin/labels" replace />} />
-                  
                   {/* Legacy route redirects */}
                   <Route path="/grns" element={<Navigate to="/procurement/deliveries" replace />} />
-                  <Route path="/labels" element={<Navigate to="/labels-qr" replace />} />
+                  <Route path="/labels-qr" element={<Navigate to="/labels" replace />} />
+                  <Route path="/admin/labels" element={<Navigate to="/labels" replace />} />
                 </Routes>
               </AppShell>
             </ProtectedRoute>

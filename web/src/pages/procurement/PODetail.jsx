@@ -84,8 +84,8 @@ export default function PODetail() {
     { key: 'qty', label: 'Qty Ordered' },
     { key: 'qtyReceived', label: 'Received', render: (r) => r.qtyReceived || 0 },
     { key: 'qtyRemaining', label: 'Outstanding', render: (r) => r.qtyRemaining || (r.qty - (r.qtyReceived || 0)) },
-    { key: 'unitPrice', label: 'Unit Price', render: (r) => r.unitPrice ? formatCurrency(r.unitPrice, settings.currency, 2) : '-' },
-    { key: 'lineTotal', label: 'Total', render: (r) => r.lineTotal ? formatCurrency(r.lineTotal, settings.currency, 2) : '-' },
+    { key: 'unitPrice', label: 'Unit Price', render: (r) => r.unitPrice ? formatCurrency(r.unitPrice, settings.currency) : '-' },
+    { key: 'lineTotal', label: 'Total', render: (r) => r.lineTotal ? formatCurrency(r.lineTotal, settings.currency) : '-' },
   ];
 
   if (!po) {
@@ -168,7 +168,7 @@ export default function PODetail() {
             </div>
             <div>
               <div className="text-xs text-zinc-400 mb-1">Total Value</div>
-              <div className="font-medium">{formatCurrency(po.lines?.reduce((sum, l) => sum + (l.lineTotal || l.qty * (l.unitPrice || 0)), 0) || 0, settings.currency, 2)}</div>
+              <div className="font-medium">{formatCurrency(po.lines?.reduce((sum, l) => sum + (l.lineTotal || l.qty * (l.unitPrice || 0)), 0) || 0, settings.currency)}</div>
             </div>
           </div>
         </div>

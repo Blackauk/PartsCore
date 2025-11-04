@@ -12,9 +12,12 @@ import ReorderPanel from '../../components/ReorderPanel.jsx';
 import { purchaseOrders as allPOs, suppliers as allSuppliers } from '../../data/mockProcurement.js';
 import { exportToCSV } from '../../utils/csvUtils.js';
 import { useApp } from '../../context/AppContext.jsx';
+import { formatCurrency } from '../../lib/currency.js';
+import { useSettings } from '../../context/SettingsContext.jsx';
 
 export default function PurchaseOrders() {
   const { toast } = useApp();
+  const { settings } = useSettings();
   const [search, setSearch] = useState('');
   const [supplier, setSupplier] = useState('');
   const [status, setStatus] = useState('');
@@ -58,7 +61,7 @@ export default function PurchaseOrders() {
     { key: 'expectedDate', label: 'Due' },
     { key: 'site', label: 'Site' },
     { key: 'status', label: 'Status' },
-    { key: 'value', label: 'Value' },
+    { key: 'value', label: 'Value', render: (r) => formatCurrency(r.value || 0, settings.currency) },
     { key: 'docs', label: 'Docs', render: (r) => (r.docs || []).map(d => <DocTag key={d.id} tag={d.tag} />) },
     { key: 'actions', label: '', render: (r) => (
       <div className="flex gap-2">

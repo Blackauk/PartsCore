@@ -6,7 +6,6 @@ const tabs = [
   { label: 'Teams & Sites', to: '/admin/teams' },
   { label: 'Permissions', to: '/admin/permissions' },
   { label: 'Settings', to: '/admin/settings' },
-  { label: 'Labels / QR', to: '/admin/labels' },
   { label: 'Integrations', to: '/admin/integrations' },
   { label: 'Audit Log', to: '/admin/audit' },
 ];

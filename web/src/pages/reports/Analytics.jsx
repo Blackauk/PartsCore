@@ -60,7 +60,7 @@ export default function Analytics() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard title="Total Stock Value" value={formatCurrency(kpis.totalStockValue, settings.currency, 0)} />
+        <StatCard title="Total Stock Value" value={formatCurrency(kpis.totalStockValue, settings.currency)} />
         <StatCard title="Low-Stock Count" value={kpis.lowStockCount} />
         <StatCard title="Open POs" value={kpis.openPOs} />
         <StatCard title="Returns (30d)" value={kpis.returns30d} />
@@ -88,7 +88,7 @@ export default function Analytics() {
                     color: 'var(--text-primary)',
                     borderRadius: '8px'
                   }}
-                  formatter={(value) => [formatCurrency(Number(value), settings.currency, 0)]}
+                  formatter={(value) => [formatCurrency(Number(value), settings.currency)]}
                 />
                 <Legend />
               </PieChart>
@@ -134,7 +134,7 @@ export default function Analytics() {
                 <YAxis
                   stroke="var(--text-secondary)"
                   tick={{ fill: 'var(--text-secondary)' }}
-                  tickFormatter={(v) => formatCurrency(Number(v), settings.currency, 0)}
+                  tickFormatter={(v) => formatCurrency(Number(v), settings.currency)}
                 />
                 <ReTooltip
                   contentStyle={{ 
@@ -143,7 +143,7 @@ export default function Analytics() {
                     color: 'var(--text-primary)',
                     borderRadius: '8px'
                   }}
-                  formatter={(value) => [formatCurrency(Number(value), settings.currency, 0)]}
+                  formatter={(value) => [formatCurrency(Number(value), settings.currency)]}
                 />
                 <Bar dataKey="value" stackId="a" fill="#34d399" />
               </BarChart>
@@ -190,7 +190,7 @@ export default function Analytics() {
                 <YAxis
                   stroke="var(--text-secondary)"
                   tick={{ fill: 'var(--text-secondary)' }}
-                  tickFormatter={(v) => formatCurrency(Number(v), settings.currency, 0)}
+                  tickFormatter={(v) => formatCurrency(Number(v), settings.currency)}
                 />
                 <ReTooltip
                   contentStyle={{ 
@@ -199,7 +199,7 @@ export default function Analytics() {
                     color: 'var(--text-primary)',
                     borderRadius: '8px'
                   }}
-                  formatter={(value) => [formatCurrency(Number(value), settings.currency, 0)]}
+                  formatter={(value) => [formatCurrency(Number(value), settings.currency)]}
                 />
                 <Legend 
                   payload={usageLegendPayload} 
