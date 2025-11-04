@@ -1,4 +1,4 @@
-import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/AppShell.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Dashboard from './pages/dashboard/index.jsx';
@@ -65,17 +65,10 @@ import ItemEdit from './pages/catalog/ItemEdit.jsx';
 import History from './pages/inventory/History.jsx';
 
 export default function AppRoutes() {
-  // Router toggle: HashRouter for production (GitHub Pages), BrowserRouter for dev
-  // Set VITE_USE_HASH=1 in production build, VITE_USE_HASH=0 for development
-  const useHash = import.meta.env.VITE_USE_HASH === '1';
-  const RouterImpl = useHash ? HashRouter : BrowserRouter;
-  
-  // Only use basename with BrowserRouter (HashRouter doesn't need it)
-  const basename = !useHash ? (import.meta.env.BASE_URL || '/PartsCore/') : undefined;
-  
+  // Router is now mounted at top level in main.jsx
+  // This component only returns Routes (no Router wrapper)
   return (
-    <RouterImpl {...(basename ? { basename } : {})}>
-      <Routes>
+    <Routes>
         {/* Public auth routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -166,7 +159,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-      </Routes>
-    </RouterImpl>
+    </Routes>
   );
 }
