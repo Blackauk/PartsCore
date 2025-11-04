@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --brand-orange: #F7931E;
+  --brand-blue: #4A90E2;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-zinc-950 text-zinc-100 antialiased;
+}
+
+a {
+  @apply text-zinc-200 hover:text-white underline-offset-4 hover:underline;
+}
+
+.card {
+  @apply bg-zinc-900 border border-zinc-800 rounded-2xl;
+}
+
+.input {
+  @apply bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50;
+}
+
+.btn {
+  @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm bg-zinc-800 hover:bg-orange-500/20 border border-zinc-700 hover:border-orange-500/50 transition-colors;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300;
+}
+
+/* Hide scrollbar but keep scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Print mode styles for PDF export */
+.print-mode {
+  background: white !important;
+  color: #111 !important;
+}
+
+.print-mode .card {
+  background: white !important;
+  border-color: #e5e7eb !important;
+  color: #111 !important;
+}
+
+.print-mode .text-zinc-400,
+.print-mode .text-zinc-300,
+.print-mode .text-zinc-200 {
+  color: #6b7280 !important;
+}
+
+.print-mode .text-zinc-100,
+.print-mode .text-white {
+  color: #111 !important;
+}
+
+.print-mode .bg-zinc-950,
+.print-mode .bg-zinc-900,
+.print-mode .bg-zinc-800 {
+  background: white !important;
+}
+
+.print-mode .border-zinc-800 {
+  border-color: #e5e7eb !important;
+}
+
+/* Ensure table headers repeat on each page */
+.print-mode table thead {
+  display: table-header-group;
+}
+
+.print-mode table tbody {
+  display: table-row-group;
+}

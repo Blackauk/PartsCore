@@ -1,0 +1,10 @@
+{
+  "requisitions": [
+    { "id": "r1", "status": "DRAFT", "lines": [] }
+  ],
+  "purchaseOrders": [
+    { "id": "po1", "status": "DRAFT", "supplierId": "s1", "lines": [] }
+  ]
+}
+
+

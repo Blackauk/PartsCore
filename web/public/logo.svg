@@ -1,0 +1,19 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon: Cube representing core/stock -->
+  <rect width="48" height="48" x="6" y="6" rx="8" fill="#F7931E"/>
+  <!-- Inner cube layers representing modular stock -->
+  <rect width="24" height="24" x="18" y="12" rx="4" fill="white" opacity="0.95"/>
+  <rect width="16" height="16" x="22" y="28" rx="3" fill="white" opacity="0.7"/>
+  <rect width="12" height="12" x="24" y="36" rx="2" fill="white" opacity="0.5"/>
+  
+  <!-- CoreStock text -->
+  <text x="64" y="38" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" fill="#FFFFFF" font-weight="600">
+    CoreStock
+  </text>
+  
+  <!-- Tagline -->
+  <text x="64" y="50" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="10" fill="#9CA3AF" font-weight="400">
+    by Blockwork-IT
+  </text>
+</svg>
+
