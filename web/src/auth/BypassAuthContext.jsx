@@ -11,20 +11,32 @@ export function BypassAuthProvider({ children }) {
 
   // Load persisted auth state on mount
   useEffect(() => {
-    const saved = localStorage.getItem('pc_auth');
-    if (saved === '1') {
-      setIsAuthenticated(true);
+    try {
+      const saved = localStorage.getItem('pc_auth');
+      if (saved === '1') {
+        setIsAuthenticated(true);
+      }
+    } catch (e) {
+      // ignore storage errors
     }
   }, []);
 
   const login = () => {
     setIsAuthenticated(true);
-    localStorage.setItem('pc_auth', '1');
+    try {
+      localStorage.setItem('pc_auth', '1');
+    } catch (e) {
+      // ignore storage errors
+    }
   };
 
   const logout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('pc_auth');
+    try {
+      localStorage.removeItem('pc_auth');
+    } catch (e) {
+      // ignore storage errors
+    }
   };
 
   const value = useMemo(

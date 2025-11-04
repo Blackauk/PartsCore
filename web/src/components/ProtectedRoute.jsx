@@ -1,6 +1,6 @@
 import { Navigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import { useBypassAuth } from '../auth/BypassAuthContext.jsx';
+import { useAuth as useLegacyAuth } from '../contexts/AuthContext.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
 import { bypassAuth } from '../auth/flags.js';
 import { Home } from 'lucide-react';
 
@@ -13,8 +13,8 @@ import { Home } from 'lucide-react';
  * @param {string[]} [props.requiredPermissions] - Permissions required to access this route
  */
 export default function ProtectedRoute({ children, requiredRoles, requiredPermissions }) {
-  const { isAuthenticated, isLoading, hasAnyRole, hasAnyPermission } = useAuth();
-  const { isAuthenticated: bypassIsAuthenticated } = useBypassAuth();
+  const { isAuthenticated: bypassIsAuthenticated } = useAuth();
+  const { isAuthenticated: legacyIsAuthenticated, isLoading, hasAnyRole, hasAnyPermission } = useLegacyAuth();
   const location = useLocation();
 
   // Show loading state while checking auth (only if not bypassed)
@@ -30,7 +30,7 @@ export default function ProtectedRoute({ children, requiredRoles, requiredPermis
   }
 
   // Allow access if bypass is enabled or user is authenticated (bypass or regular)
-  if (bypassAuth || bypassIsAuthenticated || isAuthenticated) {
+  if (bypassAuth || bypassIsAuthenticated || legacyIsAuthenticated) {
     // Continue with role/permission checks if not bypassed
     if (bypassAuth) {
       return children; // Skip role/permission checks when bypassed

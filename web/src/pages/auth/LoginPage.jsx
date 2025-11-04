@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { login, verifyMfa, getMe } from '../../lib/auth.js';
-import { useAuth } from '../../contexts/AuthContext.jsx';
-import { useBypassAuth } from '../../auth/BypassAuthContext.jsx';
+import { useAuth as useLegacyAuth } from '../../contexts/AuthContext.jsx';
+import { useAuth } from '../../auth/AuthContext.jsx';
 import { bypassAuth } from '../../auth/flags.js';
 import AuthLayout from '../../components/AuthLayout.jsx';
 import FormField from '../../components/FormField.jsx';
@@ -37,22 +37,21 @@ function getRedirectPath(roles) {
 export default function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { signIn } = useAuth();
-  const { login: bypassLogin } = useBypassAuth();
+  const { signIn } = useLegacyAuth();
+  const { login } = useAuth();
   const [requiresMfa, setRequiresMfa] = useState(false);
   const [mfaToken, setMfaToken] = useState(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Auto-bypass on mount if bypass is enabled (GitHub Pages)
+  // Auto-bypass on GH Pages or when env flag is set
   useEffect(() => {
     if (bypassAuth) {
-      bypassLogin();
-      const next = searchParams.get('next');
-      navigate(next ? decodeURIComponent(next) : '/dashboard', { replace: true });
+      login();
+      navigate('/', { replace: true });
     }
-  }, [bypassAuth, bypassLogin, navigate, searchParams]);
+  }, [login, navigate]);
 
   const loginForm = useForm({
     resolver: zodResolver(loginSchema),
@@ -77,9 +76,9 @@ export default function LoginPage() {
     try {
       // Bypass auth: Skip credential checks and log in immediately
       if (bypassAuth) {
-        bypassLogin();
-        const next = searchParams.get('next');
-        navigate(next ? decodeURIComponent(next) : '/dashboard', { replace: true });
+        login();
+        navigate('/', { replace: true });
+        setIsSubmitting(false);
         return;
       }
 
