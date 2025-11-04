@@ -37,8 +37,11 @@ const ReasonCodes = lazy(() => import('../pages/Admin/ReasonCodes.jsx'));
 const ImportExport = lazy(() => import('../pages/Admin/ImportExport.jsx'));
 
 export default function AppRouter() {
+  // Get basename from Vite's BASE_URL (matches vite.config.js base: '/PartsCore/')
+  const basename = import.meta.env.BASE_URL || '/PartsCore/';
+  
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <SparePartsLayout>
         <Suspense fallback={<div className="p-6">Loading...</div>}>
           <Routes>
