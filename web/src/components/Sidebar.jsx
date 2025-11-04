@@ -39,10 +39,10 @@ export default function Sidebar({ collapsed, setCollapsed, onNavigate }) {
   };
 
   return (
-    <div className="h-full p-3">
+    <div className="h-full p-3" style={{ backgroundColor: 'var(--bg-panel)' }}>
       <div className="flex items-center justify-between mb-4">
         {collapsed ? (
-          <div className="w-10 h-10 rounded-lg bg-[#F7931E] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--brand-orange, #F7931E)' }}>
             <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Core Stock" className="w-6 h-6" />
           </div>
         ) : (
@@ -76,8 +76,24 @@ export default function Sidebar({ collapsed, setCollapsed, onNavigate }) {
                   }
                 }}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                  active ? 'bg-zinc-800 text-white' : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                  active ? '' : ''
                 }`}
+                style={{
+                  backgroundColor: active ? 'var(--bg-elevated)' : 'transparent',
+                  color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }
+                }}
                 aria-current={active ? 'page' : undefined}
               >
                 <Icon size={18} />
@@ -102,11 +118,23 @@ export default function Sidebar({ collapsed, setCollapsed, onNavigate }) {
                         key={child.path}
                         to={child.path}
                         onClick={onNavigate}
-                        className={`block px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                          childActive
-                            ? 'bg-zinc-800 text-white'
-                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                        }`}
+                        className={`block px-3 py-1.5 rounded-lg text-sm transition-colors`}
+                        style={{
+                          backgroundColor: childActive ? 'var(--bg-elevated)' : 'transparent',
+                          color: childActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!childActive) {
+                            e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                            e.currentTarget.style.color = 'var(--text-primary)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!childActive) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.color = 'var(--text-secondary)';
+                          }
+                        }}
                         aria-current={childActive ? 'page' : undefined}
                       >
                         {child.label}

@@ -74,7 +74,7 @@ export default function Feedback() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold mb-2 flex items-center gap-2">
-          <MessageSquare className="text-[#F7931E]" size={28} />
+          <MessageSquare size={28} style={{ color: 'var(--brand-orange)' }} />
           Feedback & Suggestions
         </h1>
         <p className="text-sm text-zinc-400">
@@ -199,7 +199,18 @@ export default function Feedback() {
         <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
           <button
             type="submit"
-            className="btn bg-[#F7931E]/20 hover:bg-[#F7931E]/30 border-[#F7931E]/30 text-[#F7931E]"
+            className="btn"
+            style={{
+              backgroundColor: 'rgba(247, 147, 30, 0.2)',
+              borderColor: 'rgba(247, 147, 30, 0.3)',
+              color: 'var(--brand-orange)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.2)';
+            }}
             disabled={isSubmitting || !subject.trim() || !message.trim()}
           >
             {isSubmitting ? (

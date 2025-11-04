@@ -148,7 +148,21 @@ export default function LabelSettingsDrawer({ open, onClose, settings, onSave })
           <button onClick={onClose} className="btn-secondary flex-1">
             Cancel
           </button>
-          <button onClick={handleSave} className="btn bg-[#F7931E]/20 hover:bg-[#F7931E]/30 border-[#F7931E]/30 text-[#F7931E] flex-1">
+          <button 
+            onClick={handleSave} 
+            className="btn flex-1"
+            style={{
+              backgroundColor: 'rgba(247, 147, 30, 0.2)',
+              borderColor: 'rgba(247, 147, 30, 0.3)',
+              color: 'var(--brand-orange)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.2)';
+            }}
+          >
             <Save size={16} />
             Save Preferences
           </button>

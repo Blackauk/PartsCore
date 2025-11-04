@@ -13,18 +13,26 @@ import { exportToCSV } from '../../utils/csvUtils.js';
 
 function StatusBadge({ stock, min }) {
   let status = 'In Stock';
-  let className = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+  let style = { bg: 'var(--success-bg)', text: 'var(--success-text)', border: 'var(--success-text)' };
   
   if (stock === 0) {
     status = 'Out';
-    className = 'bg-red-500/20 text-red-400 border-red-500/40';
+    style = { bg: 'var(--danger-bg)', text: 'var(--danger-text)', border: 'var(--danger-text)' };
   } else if (stock < min) {
     status = 'Low';
-    className = 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+    style = { bg: 'var(--warning-bg)', text: 'var(--warning-text)', border: 'var(--warning-text)' };
   }
   
   return (
-    <span className={`inline-block px-2 py-0.5 rounded text-xs border ${className}`}>
+    <span 
+      className="inline-block px-2 py-0.5 rounded text-xs border"
+      style={{
+        backgroundColor: style.bg,
+        color: style.text,
+        borderColor: style.border,
+        opacity: 0.9
+      }}
+    >
       {status}
     </span>
   );

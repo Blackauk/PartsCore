@@ -88,7 +88,18 @@ export default function MinMaxModal({ open, onClose, item, onSave }) {
           </button>
           <button
             type="submit"
-            className="btn bg-[#F7931E]/20 hover:bg-[#F7931E]/30 border-[#F7931E]/30 text-[#F7931E]"
+            className="btn"
+            style={{
+              backgroundColor: 'rgba(247, 147, 30, 0.2)',
+              borderColor: 'rgba(247, 147, 30, 0.3)',
+              color: 'var(--brand-orange)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.2)';
+            }}
             disabled={saving}
           >
             {saving ? 'Saving...' : 'Save'}

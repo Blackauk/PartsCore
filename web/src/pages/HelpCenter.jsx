@@ -91,7 +91,7 @@ export default function HelpCenter() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold mb-2 flex items-center gap-2">
-          <HelpCircle className="text-[#F7931E]" size={28} />
+          <HelpCircle size={28} style={{ color: 'var(--brand-orange)' }} />
           Help Centre
         </h1>
         <p className="text-sm text-zinc-400">
@@ -107,7 +107,18 @@ export default function HelpCenter() {
           placeholder="Search help topics..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 text-sm rounded-lg border border-zinc-800 bg-zinc-900 focus:ring-2 focus:ring-[#F7931E]/50 focus:outline-none"
+              className="w-full pl-10 pr-3 py-2 text-sm rounded-lg border input"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-panel)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 0 2px var(--brand-orange)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(247, 147, 30, 0.5)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = '';
+              }}
         />
       </div>
 
@@ -124,7 +135,7 @@ export default function HelpCenter() {
                 className="w-full flex items-center justify-between text-left"
               >
                 <div className="flex items-center gap-3">
-                  <Icon className="text-[#F7931E]" size={20} />
+                  <Icon size={20} style={{ color: 'var(--brand-orange)' }} />
                   <h2 className="font-semibold text-base">{section.title}</h2>
                   <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
                     {section.items.length}
@@ -153,9 +164,9 @@ export default function HelpCenter() {
       </div>
 
       {/* Contact Section */}
-      <div className="card p-6 bg-[#F7931E]/10 border-[#F7931E]/20">
+      <div className="card p-6" style={{ backgroundColor: 'rgba(247, 147, 30, 0.1)', borderColor: 'rgba(247, 147, 30, 0.2)' }}>
         <div className="flex items-start gap-3">
-          <Mail className="text-[#F7931E] flex-shrink-0 mt-1" size={20} />
+          <Mail className="flex-shrink-0 mt-1" size={20} style={{ color: 'var(--brand-orange)' }} />
           <div>
             <h3 className="font-semibold mb-1">Still need help?</h3>
             <p className="text-sm text-zinc-400 mb-3">
@@ -164,7 +175,18 @@ export default function HelpCenter() {
             <div className="flex gap-2">
               <a
                 href="mailto:support@blockwork-it.co.uk"
-                className="btn bg-[#F7931E]/20 hover:bg-[#F7931E]/30 border-[#F7931E]/30 text-[#F7931E]"
+                className="btn"
+                style={{
+                  backgroundColor: 'rgba(247, 147, 30, 0.2)',
+                  borderColor: 'rgba(247, 147, 30, 0.3)',
+                  color: 'var(--brand-orange)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(247, 147, 30, 0.2)';
+                }}
               >
                 <Mail size={16} />
                 Email Support

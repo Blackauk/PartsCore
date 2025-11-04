@@ -5,10 +5,11 @@ import { useAuthStore } from '../store/authStore.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import UserMenu from './UserMenu.jsx';
+import { useTheme } from '../hooks/useTheme.js';
 
 export default function Topbar({ onHamburger }) {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+  const { theme, toggle: toggleTheme } = useTheme();
   const [newMenuOpen, setNewMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const authStoreUser = useAuthStore((s) => s.currentUser);
@@ -16,11 +17,6 @@ export default function Topbar({ onHamburger }) {
   const currentUser = authUser || authStoreUser;
   const role = currentUser?.role || (authUser?.roles?.includes('admin') ? 'Admin' : 'Viewer');
   const setRole = useAuthStore((s) => s.setRole);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -34,10 +30,6 @@ export default function Topbar({ onHamburger }) {
     }
   }, [newMenuOpen]);
 
-  function toggleTheme() {
-    setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
-  }
-
   const newActions = [
     { label: 'New Item', icon: Package, action: () => navigate('/inventory') },
     { label: 'New PO', icon: FileText, action: () => navigate('/procurement') },
@@ -45,7 +37,15 @@ export default function Topbar({ onHamburger }) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 h-[56px] border-b border-zinc-800 bg-zinc-950/80 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/60" style={{'--header-h': '56px'}}>
+    <header 
+      className="sticky top-0 z-40 h-[56px] border-b backdrop-blur supports-[backdrop-filter]:bg-opacity-80" 
+      style={{
+        '--header-h': '56px',
+        backgroundColor: 'var(--bg-panel)',
+        borderColor: 'var(--border-color)',
+        opacity: 0.95
+      }}
+    >
       <div className="flex items-center gap-3 p-3 h-full">
         <button className="btn md:hidden" onClick={onHamburger} aria-label="Open sidebar">
           <Menu size={16} />
@@ -64,7 +64,16 @@ export default function Topbar({ onHamburger }) {
                   return (
                     <button
                       key={action.label}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-zinc-800 rounded-lg transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+                      style={{
+                        color: 'var(--text-primary)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                       onClick={() => {
                         action.action();
                         setNewMenuOpen(false);
@@ -88,8 +97,16 @@ export default function Topbar({ onHamburger }) {
               {['Admin','Manager','Supervisor','Fitter','Viewer'].map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           )}
-          <button className="btn" onClick={toggleTheme} aria-label="Toggle Theme" title="Toggle Theme">
+          <button
+            id="theme-toggle-button"
+            type="button"
+            onClick={toggleTheme}
+            aria-pressed={theme === 'light'}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            className="btn"
+          >
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            <span className="hidden sm:inline">{theme === 'dark' ? 'Light' : 'Dark'}</span>
           </button>
           {currentUser && <UserMenu />}
         </div>

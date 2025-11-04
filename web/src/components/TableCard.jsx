@@ -6,7 +6,7 @@ function SkeletonRow({ colCount }) {
     <tr>
       {Array.from({ length: colCount }).map((_, i) => (
         <td key={i} className="px-4 py-3">
-          <div className="h-4 bg-zinc-800 rounded animate-pulse" />
+          <div className="h-4 rounded animate-pulse" style={{ backgroundColor: 'var(--bg-elevated)' }} />
         </td>
       ))}
     </tr>
@@ -33,17 +33,29 @@ export default function TableCard({
   return (
     <div className="card">
       {title && (
-        <div className="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
-          <div className="font-medium">{title}</div>
+        <div 
+          className="px-5 py-4 border-b flex items-center justify-between"
+          style={{ 
+            borderColor: 'var(--border-color)',
+            backgroundColor: 'var(--table-header-bg)'
+          }}
+        >
+          <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{title}</div>
         </div>
       )}
       
       {error && (
-        <div className="p-4 bg-red-500/10 border-b border-red-500/20">
+        <div 
+          className="p-4 border-b"
+          style={{
+            backgroundColor: 'var(--danger-bg)',
+            borderColor: 'var(--border-color)'
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-red-400 font-medium text-sm">Error loading data</h3>
-              <p className="text-xs text-red-300/80 mt-1">{error}</p>
+              <h3 className="font-medium text-sm" style={{ color: 'var(--danger-text)' }}>Error loading data</h3>
+              <p className="text-xs mt-1" style={{ color: 'var(--danger-text)' }}>{error}</p>
             </div>
             {onRetry && (
               <button className="btn btn-xs" onClick={onRetry}>Retry</button>
@@ -63,15 +75,36 @@ export default function TableCard({
                   <th 
                     key={c.key} 
                     onClick={() => isSortable && handleHeaderClick(c.key)}
-                    className={`text-center px-4 py-3 text-zinc-400 font-medium ${
-                      isSortable ? 'cursor-pointer select-none hover:bg-zinc-800/50' : ''
+                    className={`text-center px-4 py-3 font-medium ${
+                      isSortable ? 'cursor-pointer select-none' : ''
                     }`}
+                    style={{
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'var(--table-header-bg)',
+                      ...(isSortable ? {
+                        transition: 'background-color 0.2s ease'
+                      } : {})
+                    }}
+                    onMouseEnter={(e) => {
+                      if (isSortable) {
+                        e.currentTarget.style.backgroundColor = 'var(--table-row-hover)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isSortable) {
+                        e.currentTarget.style.backgroundColor = 'var(--table-header-bg)';
+                      }
+                    }}
                     title={isSortable ? 'Click to sort (asc → desc → off)' : undefined}
                   >
                     <span className="inline-flex items-center gap-1">
                       {c.label}
                       {isSortable && (
-                        <span aria-hidden className="inline-block text-xs text-zinc-500">
+                        <span 
+                          aria-hidden 
+                          className="inline-block text-xs"
+                          style={{ color: 'var(--muted)' }}
+                        >
                           {isSorted ? (
                             sortConfig.direction === 'asc' ? '▲' : '▼'
                           ) : (
@@ -92,15 +125,30 @@ export default function TableCard({
               ))
             ) : !rows || rows.length === 0 ? (
               <tr>
-                <td className="px-4 py-12 text-zinc-500 text-center" colSpan={columns.length || 1}>
+                <td 
+                  className="px-4 py-12 text-center" 
+                  colSpan={columns.length || 1}
+                  style={{ color: 'var(--muted)' }}
+                >
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
               rows.map((r, i) => (
-                <tr key={i} className="border-t border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900/40">
+                <tr 
+                  key={i} 
+                  className="border-t table-row-hover"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    transition: 'background-color 0.2s ease'
+                  }}
+                >
                   {columns.map((c) => (
-                    <td key={c.key} className="px-4 py-3 text-center text-zinc-200">
+                    <td 
+                      key={c.key} 
+                      className="px-4 py-3 text-center"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
                       {c.render ? c.render(r) : (r[c.key] ?? '')}
                     </td>
                   ))}

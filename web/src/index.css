@@ -2,9 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import theme variables */
+@import './styles/theme.css';
+@import './styles/utilities.css';
+
 :root {
   color-scheme: dark;
-  --brand-orange: #F7931E;
+  /* Note: --brand-orange is defined in theme.css */
   --brand-blue: #4A90E2;
 }
 
@@ -15,27 +19,60 @@ body,
 }
 
 body {
-  @apply bg-zinc-950 text-zinc-100 antialiased;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  @apply antialiased;
 }
 
 a {
-  @apply text-zinc-200 hover:text-white underline-offset-4 hover:underline;
+  color: var(--text-secondary);
+  @apply underline-offset-4 hover:underline;
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: var(--text-primary);
 }
 
 .card {
-  @apply bg-zinc-900 border border-zinc-800 rounded-2xl;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  @apply rounded-2xl;
 }
 
 .input {
-  @apply bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  @apply rounded-lg px-3 py-2 text-sm focus:outline-none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.input:focus {
+  box-shadow: var(--focus-ring);
 }
 
 .btn {
-  @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm bg-zinc-800 hover:bg-orange-500/20 border border-zinc-700 hover:border-orange-500/50 transition-colors;
+  background-color: var(--btn-muted-bg);
+  color: var(--btn-muted-text);
+  border: 1px solid var(--border-color);
+  @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors;
+}
+
+.btn:hover {
+  background-color: var(--bg-elevated);
+  border-color: var(--brand);
 }
 
 .btn-secondary {
-  @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300;
+  background-color: var(--btn-muted-bg);
+  color: var(--btn-muted-text);
+  border: 1px solid var(--border-color);
+  @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors;
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-elevated);
 }
 
 /* Hide scrollbar but keep scrolling */
@@ -60,25 +97,16 @@ a {
   color: #111 !important;
 }
 
-.print-mode .text-zinc-400,
-.print-mode .text-zinc-300,
-.print-mode .text-zinc-200 {
-  color: #6b7280 !important;
-}
-
-.print-mode .text-zinc-100,
-.print-mode .text-white {
-  color: #111 !important;
-}
-
-.print-mode .bg-zinc-950,
-.print-mode .bg-zinc-900,
-.print-mode .bg-zinc-800 {
-  background: white !important;
-}
-
-.print-mode .border-zinc-800 {
-  border-color: #e5e7eb !important;
+/* Print mode overrides for theme variables */
+.print-mode,
+.print-mode * {
+  --bg-page: white !important;
+  --bg-panel: white !important;
+  --bg-elevated: white !important;
+  --text-primary: #111 !important;
+  --text-secondary: #6b7280 !important;
+  --muted: #6b7280 !important;
+  --border-color: #e5e7eb !important;
 }
 
 /* Ensure table headers repeat on each page */

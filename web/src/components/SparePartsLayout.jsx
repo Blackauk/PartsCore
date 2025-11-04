@@ -101,7 +101,7 @@ export default function SparePartsLayout({ children }) {
       <aside className="h-full border-r border-zinc-800 p-3">
         <div className="flex items-center justify-between mb-3">
           {collapsed ? (
-            <div className="w-10 h-10 rounded-lg bg-[#F7931E] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--brand-orange)' }}>
               <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="CoreStock" className="w-6 h-6" />
             </div>
           ) : (

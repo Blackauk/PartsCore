@@ -1,0 +1,83 @@
+/* Dark Theme — default (matches current app) */
+:root {
+  /* Surfaces */
+  --bg-page: #0f0f12;      /* page background */
+  --bg-panel: #191a1f;     /* cards/panels/sidebar */
+  --bg-elevated: #20222a;
+
+  /* Text */
+  --text-primary: #f2f4f7;
+  --text-secondary: #a3a7b3;
+  --muted: #8a8f9b;
+
+  /* Borders/lines */
+  --border-color: #2c2f36;
+  --divider: #262932;
+
+  /* Brand / Accents */
+  --brand: #9b87f5;        /* CoreStock purple */
+  --brand-contrast: #0c0c10;
+  --brand-orange: #F7931E;  /* Legacy brand orange */
+
+  /* Buttons */
+  --btn-primary-bg: var(--brand);
+  --btn-primary-text: #0b0b0f;
+  --btn-muted-bg: #2a2d36;
+  --btn-muted-text: var(--text-primary);
+
+  /* States */
+  --success-bg: #123a28;
+  --success-text: #9be5b2;
+  --warning-bg: #3a2b12;
+  --warning-text: #ffd79a;
+  --danger-bg: #3a1616;
+  --danger-text: #ffb3b3;
+  --info-bg: #17293a;
+  --info-text: #a7d0ff;
+
+  /* Tables */
+  --table-row-hover: #20242e;
+  --table-header-bg: #1b1d24;
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 3px rgba(155,135,245,.45);
+}
+
+/* Light Theme — opt-in via data attribute */
+[data-theme="light"] {
+  --bg-page: #f8f9fa;
+  --bg-panel: #ffffff;
+  --bg-elevated: #ffffff;
+
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --muted: #6c757d;
+
+  --border-color: #dee2e6;
+  --divider: #edf0f2;
+
+  --brand: #6a5df6;
+  --brand-contrast: #ffffff;
+  --brand-orange: #F7931E;  /* Legacy brand orange */
+
+  --btn-primary-bg: var(--brand);
+  --btn-primary-text: var(--brand-contrast);
+  --btn-muted-bg: #f1f3f5;
+  --btn-muted-text: #212529;
+
+  --success-bg: #eaf9f0;
+  --success-text: #1e7f4f;
+  --warning-bg: #fff4e6;
+  --warning-text: #ad6a00;
+  --danger-bg: #fdebec;
+  --danger-text: #b02a37;
+  --info-bg: #e7f1ff;
+  --info-text: #0b6ecf;
+
+  --table-row-hover: #f4f6f8;
+  --table-header-bg: #f1f3f5;
+
+  --focus-ring: 0 0 0 3px rgba(106,93,246,.35);
+}
+
+
