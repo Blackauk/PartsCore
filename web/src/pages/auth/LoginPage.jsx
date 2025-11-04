@@ -63,9 +63,12 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      // Use mock auth in development
+      // Use mock auth in development or when API_URL is not set
+      const API_URL = import.meta.env.VITE_API_URL || '';
+      const useMockAuth = import.meta.env.DEV || !API_URL;
+      
       let result;
-      if (import.meta.env.DEV) {
+      if (useMockAuth) {
         const { mockLoginApi } = await import('../../lib/auth.mock.js');
         const mockResult = await mockLoginApi({ identifier: data.identifier, password: data.password });
         if (mockResult.ok) {
@@ -96,7 +99,7 @@ export default function LoginPage() {
           }
           return;
         } else {
-          throw new Error(mockResult.message);
+          throw new Error(mockResult.message || 'Invalid credentials');
         }
       }
       
