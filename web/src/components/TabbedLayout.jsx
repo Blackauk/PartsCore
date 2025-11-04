@@ -36,7 +36,7 @@ export default function TabbedLayout({ tabs = [], rightControls = null }) {
   return (
     <>
       {/* Tab Bar - Sticky, flush under header, positioned absolutely to break out of padding */}
-      <div className="sticky z-30 bg-zinc-950/95 backdrop-blur supports-[backdrop-filter]:bg-zinc-950/80 border-b border-zinc-800/60 -mx-4 md:-mx-6" style={{ top: '0' }}>
+      <div className="sticky z-30 bg-panel backdrop-blur supports-[backdrop-filter]:bg-panel/80 border-b border-base -mx-4 md:-mx-6" style={{ top: '0', opacity: 0.95 }}>
         <div className="flex items-center gap-2 flex-wrap px-4 md:px-6 py-2">
           <nav
             ref={tabListRef}
@@ -55,10 +55,10 @@ export default function TabbedLayout({ tabs = [], rightControls = null }) {
                   id={`tab-${to.replace(/\//g, '-')}`}
                   aria-controls={`panel-${to.replace(/\//g, '-')}`}
                   aria-selected={isActive}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-600 focus:ring-offset-2 focus:ring-offset-zinc-950 ${
+                  className={`px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-brand ${
                     isActive
-                      ? 'text-white bg-zinc-800 border-b-2 border-indigo-500'
-                      : 'text-zinc-300 hover:text-white hover:bg-zinc-800/60 border-b-2 border-transparent'
+                      ? 'text-primary bg-elevated border-b-2 border-indigo-500'
+                      : 'text-secondary hover:text-primary hover:bg-elevated border-b-2 border-transparent'
                   }`}
                 >
                   {tab.label}

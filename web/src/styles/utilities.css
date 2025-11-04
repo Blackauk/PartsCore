@@ -1,93 +1,48 @@
 /* Theme-aware utility classes for Tailwind integration */
+/* Use @layer utilities to ensure these override Tailwind defaults */
 
-.bg-page {
-  background-color: var(--bg-page);
-}
-
-.bg-panel {
-  background-color: var(--bg-panel);
-}
-
-.bg-elevated {
-  background-color: var(--bg-elevated);
-}
-
-.text-primary {
-  color: var(--text-primary);
-}
-
-.text-secondary {
-  color: var(--text-secondary);
-}
-
-.text-muted {
-  color: var(--muted);
-}
-
-.border-base {
-  border-color: var(--border-color);
-}
-
-.border-divider {
-  border-color: var(--divider);
-}
-
-/* Button utilities */
-.btn-theme-primary {
-  background-color: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-}
-
-.btn-theme-muted {
-  background-color: var(--btn-muted-bg);
-  color: var(--btn-muted-text);
-}
-
-/* State badges */
-.badge-success {
-  background-color: var(--success-bg);
-  color: var(--success-text);
-}
-
-.badge-warning {
-  background-color: var(--warning-bg);
-  color: var(--warning-text);
-}
-
-.badge-danger {
-  background-color: var(--danger-bg);
-  color: var(--danger-text);
-}
-
-.badge-info {
-  background-color: var(--info-bg);
-  color: var(--info-text);
-}
-
-/* Table utilities */
-.table-header {
-  background-color: var(--table-header-bg);
-}
-
-.table-row-hover:hover {
-  background-color: var(--table-row-hover);
-}
-
-/* Focus ring */
-.focus-ring {
-  box-shadow: var(--focus-ring);
-}
-
-/* Brand orange button variant */
-.btn-brand-orange {
-  background-color: rgba(247, 147, 30, 0.2);
-  border-color: rgba(247, 147, 30, 0.3);
-  color: var(--brand-orange);
-  transition: background-color 0.2s ease;
-}
-
-.btn-brand-orange:hover {
-  background-color: rgba(247, 147, 30, 0.3);
+@layer utilities {
+  .bg-page        { background-color: var(--bg-page) !important; }
+  .bg-panel       { background-color: var(--bg-panel) !important; }
+  .bg-elevated    { background-color: var(--bg-elevated) !important; }
+  
+  .text-primary   { color: var(--text-primary) !important; }
+  .text-secondary { color: var(--text-secondary) !important; }
+  .text-muted     { color: var(--muted) !important; }
+  
+  .border-base    { border-color: var(--border-color) !important; }
+  .divide-base    > * + * { border-top-color: var(--divider) !important; }
+  
+  .btn-primary    { background-color: var(--btn-primary-bg) !important; color: var(--btn-primary-text) !important; }
+  .btn-theme-muted { background-color: var(--btn-muted-bg) !important; color: var(--btn-muted-text) !important; }
+  
+  .badge-success  { background-color: var(--success-bg) !important; color: var(--success-text) !important; }
+  .badge-warning  { background-color: var(--warning-bg) !important; color: var(--warning-text) !important; }
+  .badge-danger   { background-color: var(--danger-bg)  !important; color: var(--danger-text)  !important; }
+  .badge-info     { background-color: var(--info-bg)    !important; color: var(--info-text)    !important; }
+  
+  .table-header   { background-color: var(--table-header-bg) !important; }
+  .row-hover:hover{ background-color: var(--table-row-hover) !important; }
+  
+  .input-base     {
+    background-color: var(--input-bg) !important;
+    color: var(--input-text) !important;
+    border-color: var(--input-border) !important;
+  }
+  
+  .focus-brand:focus { outline: var(--focus-ring); outline-offset: 0; }
+  
+  /* Legacy brand orange button variant */
+  .btn-brand-orange {
+    background-color: rgba(247, 147, 30, 0.2) !important;
+    border-color: rgba(247, 147, 30, 0.3) !important;
+    color: var(--brand-orange) !important;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-brand-orange:hover {
+    background-color: rgba(247, 147, 30, 0.3) !important;
+  }
 }
 
 

@@ -67,14 +67,14 @@ function NavItem({ item, collapsed }) {
   if (item.children) {
     return (
       <div>
-        <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-800 flex items-center gap-2" onClick={() => setOpen((v) => !v)}>
+        <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-elevated flex items-center gap-2 text-primary" onClick={() => setOpen((v) => !v)}>
           {item.icon ? <item.icon size={18} /> : null}
           {!collapsed && <span>{item.label}</span>}
         </button>
         {open && (
           <div className="mt-1 ml-2 space-y-1">
             {item.children.map((c) => (
-              <Link key={c.to} to={c.to} className={`block px-3 py-2 rounded-lg hover:bg-zinc-800 text-sm ${isActive(c.to) ? 'bg-zinc-800' : ''}`}>
+              <Link key={c.to} to={c.to} className={`block px-3 py-2 rounded-lg hover:bg-elevated text-sm text-primary ${isActive(c.to) ? 'bg-elevated' : ''}`}>
                 {c.icon ? <c.icon size={16} className="mr-2 inline" /> : null}
                 {!collapsed && c.label}
               </Link>
@@ -86,7 +86,7 @@ function NavItem({ item, collapsed }) {
   }
 
   return (
-    <Link to={item.to} className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800 ${isActive(item.to) ? 'bg-zinc-800' : ''}`}>
+    <Link to={item.to} className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-elevated text-primary ${isActive(item.to) ? 'bg-elevated' : ''}`}>
       {item.icon ? <item.icon size={18} /> : null}
       {!collapsed && <span>{item.label}</span>}
     </Link>
@@ -98,7 +98,7 @@ export default function SparePartsLayout({ children }) {
 
   return (
     <div className="h-full grid" style={{ gridTemplateColumns: collapsed ? '64px 1fr' : '260px 1fr' }}>
-      <aside className="h-full border-r border-zinc-800 p-3">
+      <aside className="h-full border-r border-base p-3 bg-panel">
         <div className="flex items-center justify-between mb-3">
           {collapsed ? (
             <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--brand-orange)' }}>
@@ -120,8 +120,8 @@ export default function SparePartsLayout({ children }) {
         </nav>
       </aside>
       <main className="h-full flex flex-col">
-        <header className="border-b border-zinc-800 p-3 flex items-center justify-between">
-          <div className="text-sm text-zinc-300">Welcome, MJ — Atlas Road</div>
+        <header className="border-b border-base p-3 flex items-center justify-between bg-panel">
+          <div className="text-sm text-secondary">Welcome, MJ — Atlas Road</div>
         </header>
         <div className="flex-1 overflow-auto p-4">
           {children}

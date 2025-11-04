@@ -229,7 +229,7 @@ export default function Items() {
       </select>
       <div className="relative flex-1 sm:flex-initial">
         <label htmlFor="items-search-input" className="sr-only">Search items</label>
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4 pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary h-4 w-4 pointer-events-none" />
         <input
           id="items-search-input"
           name="items-search"

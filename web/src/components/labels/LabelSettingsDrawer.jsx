@@ -32,14 +32,14 @@ export default function LabelSettingsDrawer({ open, onClose, settings, onSave })
       <div className="fixed inset-0 z-[80] bg-black/50" onClick={onClose} />
       
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-zinc-900 border-l border-zinc-800 shadow-2xl z-[90] flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-panel border-l border-base shadow-2xl z-[90] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
+        <div className="sticky top-0 bg-panel border-b border-base px-4 py-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
             <Settings size={20} />
             Label Settings
           </h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white">
+          <button onClick={onClose} className="text-secondary hover:text-primary">
             <X size={20} />
           </button>
         </div>
@@ -100,7 +100,7 @@ export default function LabelSettingsDrawer({ open, onClose, settings, onSave })
                 type="checkbox"
                 checked={localSettings.includeLogo}
                 onChange={(e) => setLocalSettings({ ...localSettings, includeLogo: e.target.checked })}
-                className="rounded border-zinc-700"
+                className="rounded border-base"
               />
               <span className="text-sm">Include CoreStock logo</span>
             </label>
@@ -110,7 +110,7 @@ export default function LabelSettingsDrawer({ open, onClose, settings, onSave })
                 type="checkbox"
                 checked={localSettings.includeSupplier}
                 onChange={(e) => setLocalSettings({ ...localSettings, includeSupplier: e.target.checked })}
-                className="rounded border-zinc-700"
+                className="rounded border-base"
               />
               <span className="text-sm">Include supplier information</span>
             </label>
@@ -120,7 +120,7 @@ export default function LabelSettingsDrawer({ open, onClose, settings, onSave })
                 type="checkbox"
                 checked={localSettings.border}
                 onChange={(e) => setLocalSettings({ ...localSettings, border: e.target.checked })}
-                className="rounded border-zinc-700"
+                className="rounded border-base"
               />
               <span className="text-sm">Show label border</span>
             </label>
@@ -137,14 +137,14 @@ export default function LabelSettingsDrawer({ open, onClose, settings, onSave })
               value={localSettings.fontSize}
               onChange={(e) => setLocalSettings({ ...localSettings, fontSize: parseInt(e.target.value) })}
             />
-            <div className="text-xs text-zinc-400 mt-1">
+            <div className="text-xs text-secondary mt-1">
               {localSettings.fontSize}pt
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 border-t border-zinc-800 p-4 bg-zinc-900 flex gap-3">
+        <div className="sticky bottom-0 border-t border-base p-4 bg-panel flex gap-3">
           <button onClick={onClose} className="btn-secondary flex-1">
             Cancel
           </button>

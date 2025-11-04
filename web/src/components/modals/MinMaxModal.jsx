@@ -48,7 +48,7 @@ export default function MinMaxModal({ open, onClose, item, onSave }) {
             onChange={(e) => setFormData({ ...formData, minQty: parseInt(e.target.value) || 0 })}
             required
           />
-          <p className="text-xs text-zinc-500 mt-1">Alert when stock falls below this level</p>
+          <p className="text-xs text-muted mt-1">Alert when stock falls below this level</p>
         </div>
 
         <div>
@@ -61,7 +61,7 @@ export default function MinMaxModal({ open, onClose, item, onSave }) {
             onChange={(e) => setFormData({ ...formData, maxQty: parseInt(e.target.value) || 0 })}
             required
           />
-          <p className="text-xs text-zinc-500 mt-1">Upper limit for stock level</p>
+          <p className="text-xs text-muted mt-1">Upper limit for stock level</p>
         </div>
 
         <div>
@@ -74,10 +74,10 @@ export default function MinMaxModal({ open, onClose, item, onSave }) {
             onChange={(e) => setFormData({ ...formData, reorderPoint: parseInt(e.target.value) || 0 })}
             required
           />
-          <p className="text-xs text-zinc-500 mt-1">Automatically create PO when stock reaches this level</p>
+          <p className="text-xs text-muted mt-1">Automatically create PO when stock reaches this level</p>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
+        <div className="flex justify-end gap-3 pt-4 border-t border-base">
           <button
             type="button"
             onClick={onClose}

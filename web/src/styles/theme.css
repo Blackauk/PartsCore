@@ -15,7 +15,7 @@
   --divider: #262932;
 
   /* Brand / Accents */
-  --brand: #9b87f5;        /* CoreStock purple */
+  --brand: #6a5df6;        /* CoreStock purple */
   --brand-contrast: #0c0c10;
   --brand-orange: #F7931E;  /* Legacy brand orange */
 
@@ -39,8 +39,13 @@
   --table-row-hover: #20242e;
   --table-header-bg: #1b1d24;
 
+  /* Inputs */
+  --input-bg: #1a1d24;
+  --input-text: var(--text-primary);
+  --input-border: #2a2e36;
+
   /* Focus ring */
-  --focus-ring: 0 0 0 3px rgba(155,135,245,.45);
+  --focus-ring: 0 0 0 3px rgba(106,93,246,.45);
 }
 
 /* Light Theme — opt-in via data attribute */
@@ -76,6 +81,10 @@
 
   --table-row-hover: #f4f6f8;
   --table-header-bg: #f1f3f5;
+
+  --input-bg: #ffffff;
+  --input-text: var(--text-primary);
+  --input-border: #ced4da;
 
   --focus-ring: 0 0 0 3px rgba(106,93,246,.35);
 }

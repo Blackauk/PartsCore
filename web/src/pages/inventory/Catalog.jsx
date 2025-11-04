@@ -252,7 +252,7 @@ export default function Catalog() {
       <div className="card p-4 space-y-3">
         {/* Equipment picker */}
         <div>
-          <div className="text-xs text-zinc-400 mb-2">Equipment</div>
+          <div className="text-xs text-secondary mb-2">Equipment</div>
           <div className="flex flex-wrap gap-2">
             {EQUIPMENT_PRESETS.map(preset => (
               <button
@@ -283,7 +283,7 @@ export default function Catalog() {
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <label htmlFor="catalog-search-input" className="sr-only">Search catalog items</label>
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary h-4 w-4 pointer-events-none" />
             <input
               id="catalog-search-input"
               name="catalog-search"
@@ -323,8 +323,8 @@ export default function Catalog() {
 
         {/* Actions */}
         {selected.size > 0 && (
-          <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
-            <span className="text-sm text-zinc-400">{selected.size} item{selected.size !== 1 ? 's' : ''} selected</span>
+          <div className="flex items-center justify-between pt-2 border-t border-base">
+            <span className="text-sm text-secondary">{selected.size} item{selected.size !== 1 ? 's' : ''} selected</span>
             <button onClick={handleAddToCart} className="btn">
               Add Selected to Batch
             </button>
@@ -348,9 +348,9 @@ export default function Catalog() {
         <div className="card p-0 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-zinc-800">
+              <thead className="table-header">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">
                     <button onClick={toggleAllSelection} className="p-1">
                       {selected.size === paged.length && paged.length > 0 ? (
                         <CheckSquare size={16} className="text-blue-400" />
@@ -359,15 +359,15 @@ export default function Catalog() {
                       )}
                     </button>
                   </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">SKU</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">Part Number</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">Name</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">Equipment</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">Status</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">On Hand</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">Min/Max</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">Supplier</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-zinc-300">Lead Time</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">SKU</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">Part Number</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">Name</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">Equipment</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">Status</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">On Hand</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">Min/Max</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">Supplier</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-secondary">Lead Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -380,7 +380,7 @@ export default function Catalog() {
                   return (
                     <tr 
                       key={item.sku} 
-                      className="border-t border-zinc-800 hover:bg-zinc-800/30 cursor-pointer"
+                      className="border-t border-base row-hover cursor-pointer"
                       onClick={(e) => {
                         // Don't open drawer if clicking checkbox
                         if (!e.target.closest('button')) {
@@ -415,12 +415,12 @@ export default function Catalog() {
                         {item.sku}
                         {isInCart && <span className="ml-2 px-1.5 py-0.5 bg-blue-900/30 text-blue-400 rounded text-xs">in cart</span>}
                       </td>
-                      <td className="px-4 py-2 text-sm font-mono text-zinc-300">{item.partNumber || item.oemPartNumber || '—'}</td>
+                      <td className="px-4 py-2 text-sm font-mono text-primary">{item.partNumber || item.oemPartNumber || '—'}</td>
                       <td className="px-4 py-2 text-sm">{item.name || item.description}</td>
                       <td className="px-4 py-2 text-sm">
                         <div className="flex flex-wrap gap-1">
                           {Array.isArray(item.equipment) && item.equipment.slice(0, 2).map(eq => (
-                            <span key={eq} className="px-2 py-0.5 bg-zinc-800 rounded text-xs">
+                            <span key={eq} className="px-2 py-0.5 bg-elevated rounded text-xs text-primary">
                               {eq}
                             </span>
                           ))}
@@ -437,7 +437,7 @@ export default function Catalog() {
                         </span>
                       </td>
                       <td className="px-4 py-2 text-sm">{item.onHand || 0}</td>
-                      <td className="px-4 py-2 text-sm text-zinc-400">{item.minQty || 0} / {item.maxQty || '—'}</td>
+                      <td className="px-4 py-2 text-sm text-secondary">{item.minQty || 0} / {item.maxQty || '—'}</td>
                       <td className="px-4 py-2 text-sm">{item.preferredSupplierId || item.supplier}</td>
                       <td className="px-4 py-2 text-sm">{item.leadTimeDays || item.leadTime || 0}d</td>
                     </tr>
@@ -475,18 +475,18 @@ export default function Catalog() {
                 <div className="text-sm font-medium">{item.name || item.description}</div>
                 <div className="flex flex-wrap gap-1">
                   {Array.isArray(item.equipment) && item.equipment.slice(0, 2).map(eq => (
-                    <span key={eq} className="px-2 py-0.5 bg-zinc-800 rounded text-xs">
+                    <span key={eq} className="px-2 py-0.5 bg-elevated rounded text-xs text-primary">
                       {eq}
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
+                <div className="flex items-center justify-between pt-2 border-t border-base">
                   <span className={`px-2 py-0.5 rounded text-xs ${statusColor}`}>
                     {status === 'in_stock' ? 'In Stock' : status === 'low_stock' ? 'Low' : 'OOS'}
                   </span>
-                  <span className="text-sm text-zinc-400">{item.onHand || 0} on hand</span>
+                  <span className="text-sm text-secondary">{item.onHand || 0} on hand</span>
                 </div>
-                <div className="text-xs text-zinc-500">
+                <div className="text-xs text-muted">
                   {item.preferredSupplierId || item.supplier} • {item.leadTimeDays || 0}d
                 </div>
                 <button
