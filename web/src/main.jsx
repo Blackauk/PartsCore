@@ -6,6 +6,7 @@ import App from './App.jsx'
 import { AppProvider } from './context/AppContext.jsx'
 import { ModalProvider } from './contexts/ModalContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
+import { BypassAuthProvider } from './auth/BypassAuthContext.jsx'
 import { bootstrapDataLayer } from './lib/data-migration.js'
 
 // Router toggle: HashRouter for production (GitHub Pages), BrowserRouter for dev
@@ -21,13 +22,15 @@ bootstrapDataLayer().then(() => {
   createRoot(document.getElementById('root')).render(
     <StrictMode>
       <RouterImpl {...(basename ? { basename } : {})}>
-        <AuthProvider>
-          <AppProvider>
-            <ModalProvider>
-              <App />
-            </ModalProvider>
-          </AppProvider>
-        </AuthProvider>
+        <BypassAuthProvider>
+          <AuthProvider>
+            <AppProvider>
+              <ModalProvider>
+                <App />
+              </ModalProvider>
+            </AppProvider>
+          </AuthProvider>
+        </BypassAuthProvider>
       </RouterImpl>
     </StrictMode>,
   )

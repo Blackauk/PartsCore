@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { login, verifyMfa, getMe } from '../../lib/auth.js';
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useBypassAuth } from '../../auth/BypassAuthContext.jsx';
+import { bypassAuth } from '../../auth/flags.js';
 import AuthLayout from '../../components/AuthLayout.jsx';
 import FormField from '../../components/FormField.jsx';
 import { Lock, Mail, Shield, UserRound, Eye, EyeOff } from 'lucide-react';
@@ -36,11 +38,21 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { signIn } = useAuth();
+  const { login: bypassLogin } = useBypassAuth();
   const [requiresMfa, setRequiresMfa] = useState(false);
   const [mfaToken, setMfaToken] = useState(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Auto-bypass on mount if bypass is enabled (GitHub Pages)
+  useEffect(() => {
+    if (bypassAuth) {
+      bypassLogin();
+      const next = searchParams.get('next');
+      navigate(next ? decodeURIComponent(next) : '/dashboard', { replace: true });
+    }
+  }, [bypassAuth, bypassLogin, navigate, searchParams]);
 
   const loginForm = useForm({
     resolver: zodResolver(loginSchema),
@@ -63,6 +75,14 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
+      // Bypass auth: Skip credential checks and log in immediately
+      if (bypassAuth) {
+        bypassLogin();
+        const next = searchParams.get('next');
+        navigate(next ? decodeURIComponent(next) : '/dashboard', { replace: true });
+        return;
+      }
+
       // Use mock auth in development or when API_URL is not set
       const API_URL = import.meta.env.VITE_API_URL || '';
       const useMockAuth = import.meta.env.DEV || !API_URL;

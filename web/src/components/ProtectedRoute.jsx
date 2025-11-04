@@ -1,5 +1,7 @@
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { useBypassAuth } from '../auth/BypassAuthContext.jsx';
+import { bypassAuth } from '../auth/flags.js';
 import { Home } from 'lucide-react';
 
 /**
@@ -12,10 +14,11 @@ import { Home } from 'lucide-react';
  */
 export default function ProtectedRoute({ children, requiredRoles, requiredPermissions }) {
   const { isAuthenticated, isLoading, hasAnyRole, hasAnyPermission } = useAuth();
+  const { isAuthenticated: bypassIsAuthenticated } = useBypassAuth();
   const location = useLocation();
 
-  // Show loading state while checking auth
-  if (isLoading) {
+  // Show loading state while checking auth (only if not bypassed)
+  if (isLoading && !bypassAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950">
         <div className="text-center">
@@ -26,8 +29,15 @@ export default function ProtectedRoute({ children, requiredRoles, requiredPermis
     );
   }
 
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
+  // Allow access if bypass is enabled or user is authenticated (bypass or regular)
+  if (bypassAuth || bypassIsAuthenticated || isAuthenticated) {
+    // Continue with role/permission checks if not bypassed
+    if (bypassAuth) {
+      return children; // Skip role/permission checks when bypassed
+    }
+    // Continue with existing role/permission logic for regular auth
+  } else {
+    // Redirect to login if not authenticated
     const next = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/login?next=${next}`} replace />;
   }

@@ -11,6 +11,7 @@ import FeedbackModal from '../components/modals/FeedbackModal.jsx';
 import ConfirmLogout from '../components/modals/ConfirmLogout.jsx';
 import { useAuthStore } from '../store/authStore.js';
 import { useAuth } from './AuthContext.jsx';
+import { useBypassAuth } from '../auth/BypassAuthContext.jsx';
 
 const ModalContext = createContext(null);
 
@@ -19,6 +20,7 @@ export function ModalProvider({ children }) {
   const navigate = useNavigate();
   const authStoreSignOut = useAuthStore((s) => s.signOut);
   const { signOut: authSignOut } = useAuth();
+  const { logout: bypassLogout } = useBypassAuth();
 
   const openModal = (modalId) => {
     setActiveModal(modalId);
@@ -81,7 +83,8 @@ export function ModalProvider({ children }) {
             open={true} 
             onClose={closeModal} 
             onConfirm={async () => {
-              // Sign out from both auth systems for compatibility
+              // Sign out from all auth systems (bypass, regular, and store)
+              bypassLogout();
               await authSignOut();
               authStoreSignOut();
               navigate('/login');
