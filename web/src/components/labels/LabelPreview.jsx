@@ -1,4 +1,4 @@
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function LabelPreview({
   sku,
@@ -18,7 +18,7 @@ export default function LabelPreview({
       <div className="flex justify-between items-start mb-2">
         {displayQR && (
           <div className="flex-shrink-0">
-            <QRCode
+            <QRCodeSVG
               value={qrValue}
               size={50}
               level="H"
