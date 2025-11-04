@@ -282,9 +282,13 @@ export default function Catalog() {
         {/* Search and filters */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4" />
+            <label htmlFor="catalog-search-input" className="sr-only">Search catalog items</label>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4 pointer-events-none" />
             <input
-              className="w-full pl-9 pr-3 py-1.5 text-sm rounded-md border border-zinc-700 bg-zinc-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              id="catalog-search-input"
+              name="catalog-search"
+              type="search"
+              className="input w-full pl-9 pr-3 py-1.5 text-sm"
               placeholder="Search SKU/Part/Name..."
               value={search}
               onChange={(e) => {
@@ -293,7 +297,10 @@ export default function Catalog() {
               }}
             />
           </div>
+          <label htmlFor="catalog-stock-filter-select" className="sr-only">Filter by stock status</label>
           <select
+            id="catalog-stock-filter-select"
+            name="catalog-stock-filter"
             className="input text-sm"
             value={stockFilter}
             onChange={(e) => {

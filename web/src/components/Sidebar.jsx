@@ -3,6 +3,7 @@ import { Menu, Home, Boxes, ShoppingCart, BarChart3, Settings, Printer, ChevronR
 import NavItem from './NavItem.jsx';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { getSidebarNav } from '../config/nav.js';
+import { getActiveInventoryTab } from '../constants/inventoryTabs.js';
 import { useState } from 'react';
 
 const iconMap = {
@@ -23,6 +24,11 @@ export default function Sidebar({ collapsed, setCollapsed, onNavigate }) {
   
   const isActive = (path) => {
     if (path === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/';
+    // Special handling for Inventory tabs - use getActiveInventoryTab for accurate matching
+    if (path.startsWith('/inventory/')) {
+      const activeTab = getActiveInventoryTab(location.pathname);
+      return activeTab?.path === path;
+    }
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 

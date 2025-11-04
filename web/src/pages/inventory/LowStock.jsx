@@ -33,9 +33,13 @@ export default function LowStock() {
   const controls = useMemo(() => (
     <>
       <div className="relative flex-1 sm:flex-initial">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4" />
+        <label htmlFor="lowstock-search-input" className="sr-only">Search low stock items</label>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4 pointer-events-none" />
         <input
-          className="w-full sm:w-64 pl-9 pr-3 py-1.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          id="lowstock-search-input"
+          name="lowstock-search"
+          type="search"
+          className="input w-full sm:w-64 pl-9 pr-3 py-1.5 text-sm"
           placeholder="Search..."
           value={search}
           onChange={(e) => {

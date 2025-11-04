@@ -102,6 +102,8 @@ export default function AppRoutes() {
                     <Route path="fast-movers" element={<FastMovers key="fast-movers" />} />
                     <Route path="movements" element={<Navigate to="/movements" replace />} />
                     <Route path="history" element={<History key="history" />} />
+                    {/* Temporary alias: if anything navigates to /inventory/stock, redirect to Items */}
+                    <Route path="stock" element={<Navigate to="/inventory/items" replace />} />
                   </Route>
                   
                   <Route path="/catalog/items/:sku" element={<ItemDetail />} />

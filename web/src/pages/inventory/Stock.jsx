@@ -9,18 +9,26 @@ import { usePageControls } from '../../contexts/PageControlsContext.jsx';
 
 function StatusBadge({ stock, min }) {
   let status = 'In Stock';
-  let className = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+  let style = { bg: 'var(--success-bg)', text: 'var(--success-text)', border: 'var(--success-text)' };
   
   if (stock === 0) {
     status = 'Out';
-    className = 'bg-red-500/20 text-red-400 border-red-500/40';
+    style = { bg: 'var(--danger-bg)', text: 'var(--danger-text)', border: 'var(--danger-text)' };
   } else if (stock < min) {
     status = 'Low';
-    className = 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+    style = { bg: 'var(--warning-bg)', text: 'var(--warning-text)', border: 'var(--warning-text)' };
   }
   
   return (
-    <span className={`inline-block px-2 py-0.5 rounded text-xs border ${className}`}>
+    <span 
+      className="inline-block px-2 py-0.5 rounded text-xs border"
+      style={{
+        backgroundColor: style.bg,
+        color: style.text,
+        borderColor: style.border,
+        opacity: 0.9
+      }}
+    >
       {status}
     </span>
   );
@@ -29,6 +37,7 @@ function StatusBadge({ stock, min }) {
 export default function Stock() {
   const { toast } = useApp();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(0);
   const [editing, setEditing] = useState(null);
@@ -39,6 +48,44 @@ export default function Stock() {
   // Use refs to prevent infinite loops
   const prevFiltersRef = useRef({ search: '', category: '' });
   const abortControllerRef = useRef(null);
+  const debounceTimerRef = useRef(null);
+  const rendersRef = useRef(0);
+
+  // Render counter for debugging (temporary)
+  rendersRef.current++;
+  if (rendersRef.current % 50 === 0) {
+    console.debug('[Inventory/Stock] renders:', rendersRef.current);
+  }
+
+  // Mount/unmount logging
+  useEffect(() => {
+    console.debug('[Inventory/Stock] mounted');
+    return () => {
+      console.debug('[Inventory/Stock] unmounted');
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Debounce search input (300ms)
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(0);
+    }, 300);
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [search]);
 
   // Simulate data loading with cancellation
   useEffect(() => {
@@ -76,31 +123,31 @@ export default function Stock() {
   // Safe defaults
   const items = useMemo(() => allItems || [], []);
   
-  // Filter with stable dependencies
+  // Filter with stable dependencies and effect guard
   const filtered = useMemo(() => {
     // Check if filters actually changed to prevent unnecessary recalculations
-    const currentFilters = { search, category };
+    const currentFilters = { search: debouncedSearch, category };
     const filtersChanged = 
-      prevFiltersRef.current.search !== search ||
+      prevFiltersRef.current.search !== debouncedSearch ||
       prevFiltersRef.current.category !== category;
     
     if (!filtersChanged && prevFiltersRef.current.items === items) {
       return prevFiltersRef.current.filtered || [];
     }
     
-    prevFiltersRef.current = { search, category, items };
+    prevFiltersRef.current = { search: debouncedSearch, category, items };
     
     const result = items.filter((r) =>
       (!category || r.category === category) && (
-        search === '' ||
-        (r.sku || '').toLowerCase().includes(search.toLowerCase()) ||
-        (r.name || '').toLowerCase().includes(search.toLowerCase())
+        debouncedSearch === '' ||
+        (r.sku || '').toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        (r.name || '').toLowerCase().includes(debouncedSearch.toLowerCase())
       )
     );
     
     prevFiltersRef.current.filtered = result;
     return result;
-  }, [search, category, items]);
+  }, [debouncedSearch, category, items]);
 
   const start = page * pageSize;
   const paged = filtered.slice(start, start + pageSize);
@@ -133,7 +180,10 @@ export default function Stock() {
   // Register controls with parent (stable dependencies)
   const controls = useMemo(() => (
     <>
+      <label htmlFor="stock-category-select" className="sr-only">Filter by category</label>
       <select
+        id="stock-category-select"
+        name="stock-category"
         className="hidden sm:block input text-sm px-2"
         value={category}
         onChange={(e) => {
@@ -147,14 +197,18 @@ export default function Stock() {
         ))}
       </select>
       <div className="relative flex-1 sm:flex-initial">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4" />
+        <label htmlFor="stock-search-input" className="sr-only">Search stock items</label>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4 pointer-events-none" />
         <input
-          className="w-full sm:w-64 pl-9 pr-3 py-1.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          id="stock-search-input"
+          name="stock-search"
+          type="search"
+          className="input w-full sm:w-64 pl-9 pr-3 py-1.5 text-sm"
           placeholder="Search..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
-            setPage(0);
+            // Page reset handled by debounce effect
           }}
         />
       </div>
@@ -168,7 +222,7 @@ export default function Stock() {
       <TableCard columns={columns} rows={paged} isLoading={loading} error={error} onRetry={handleRetry} />
       <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit Stock Item" />
 
-      <div className="flex items-center justify-between text-sm text-zinc-400">
+      <div className="flex items-center justify-between text-sm" style={{ color: 'var(--text-secondary)' }}>
         <span>Page {page + 1} of {pageCount}</span>
         <div className="flex gap-2">
           <button className="btn" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>Prev</button>

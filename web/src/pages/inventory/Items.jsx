@@ -43,7 +43,7 @@ function SkeletonRow() {
     <tr>
       {Array.from({ length: 8 }).map((_, i) => (
         <td key={i} className="px-4 py-3">
-          <div className="h-4 bg-zinc-800 rounded animate-pulse" />
+          <div className="h-4 rounded animate-pulse" style={{ backgroundColor: 'var(--bg-elevated)' }} />
         </td>
       ))}
     </tr>
@@ -66,6 +66,13 @@ export default function Items() {
   const abortControllerRef = useRef(null);
   const prevFiltersRef = useRef({ search: '', category: '' });
   const debounceTimerRef = useRef(null);
+  const rendersRef = useRef(0);
+
+  // Render counter for debugging (temporary)
+  rendersRef.current++;
+  if (rendersRef.current % 50 === 0) {
+    console.debug('[Inventory/Items] renders:', rendersRef.current);
+  }
 
   // Mount/unmount logging for debugging
   useEffect(() => {
@@ -204,7 +211,10 @@ export default function Items() {
   // Register controls with parent (stable dependencies)
   const controls = useMemo(() => (
     <>
+      <label htmlFor="items-category-select" className="sr-only">Filter by category</label>
       <select
+        id="items-category-select"
+        name="items-category"
         className="hidden sm:block input text-sm px-2"
         value={category}
         onChange={(e) => {
@@ -218,9 +228,13 @@ export default function Items() {
         ))}
       </select>
       <div className="relative flex-1 sm:flex-initial">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4" />
+        <label htmlFor="items-search-input" className="sr-only">Search items</label>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4 pointer-events-none" />
         <input
-          className="w-full sm:w-64 pl-9 pr-3 py-1.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          id="items-search-input"
+          name="items-search"
+          type="search"
+          className="input w-full sm:w-64 pl-9 pr-3 py-1.5 text-sm"
           placeholder="Search..."
           value={search}
           onChange={(e) => {
