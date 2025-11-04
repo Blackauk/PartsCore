@@ -1,7 +1,8 @@
 /**
  * Shared layout for authentication pages
  */
-export default function AuthLayout({ brand = { name: 'Core Stock', logoUrl: '/brand.svg' }, children }) {
+const baseUrl = import.meta.env.BASE_URL || '/PartsCore/';
+export default function AuthLayout({ brand = { name: 'Core Stock', logoUrl: `${baseUrl}brand.svg` }, children }) {
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">

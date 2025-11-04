@@ -2,11 +2,13 @@
 <meta charset="utf-8">
 <meta http-equiv="refresh" content="0; url=/PartsCore/">
 <script>
-  // Redirect preserves deep links inside /PartsCore/
+  // GitHub Pages SPA fallback - redirects to base path preserving hash routing
   const base = '/PartsCore/';
   const path = location.pathname.startsWith(base)
     ? location.pathname.slice(base.length)
     : '';
-  location.replace(base + path + location.search + location.hash);
+  // Preserve hash for HashRouter (e.g., #/login)
+  const hash = location.hash || '#/';
+  location.replace(base + hash);
 </script>
 

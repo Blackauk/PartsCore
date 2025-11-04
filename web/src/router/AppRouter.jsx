@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import SparePartsLayout from '../components/SparePartsLayout.jsx';
 
 // Dashboard
@@ -37,11 +37,16 @@ const ReasonCodes = lazy(() => import('../pages/Admin/ReasonCodes.jsx'));
 const ImportExport = lazy(() => import('../pages/Admin/ImportExport.jsx'));
 
 export default function AppRouter() {
-  // Get basename from Vite's BASE_URL (matches vite.config.js base: '/PartsCore/')
-  const basename = import.meta.env.BASE_URL || '/PartsCore/';
+  // Router toggle: HashRouter for production (GitHub Pages), BrowserRouter for dev
+  // Set VITE_USE_HASH=1 in production build, VITE_USE_HASH=0 for development
+  const useHash = import.meta.env.VITE_USE_HASH === '1';
+  const RouterImpl = useHash ? HashRouter : BrowserRouter;
+  
+  // Only use basename with BrowserRouter (HashRouter doesn't need it)
+  const basename = !useHash ? (import.meta.env.BASE_URL || '/PartsCore/') : undefined;
   
   return (
-    <BrowserRouter basename={basename}>
+    <RouterImpl {...(basename ? { basename } : {})}>
       <SparePartsLayout>
         <Suspense fallback={<div className="p-6">Loading...</div>}>
           <Routes>

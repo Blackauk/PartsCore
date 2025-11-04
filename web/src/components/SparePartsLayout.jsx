@@ -102,11 +102,11 @@ export default function SparePartsLayout({ children }) {
         <div className="flex items-center justify-between mb-3">
           {collapsed ? (
             <div className="w-10 h-10 rounded-lg bg-[#F7931E] flex items-center justify-center">
-              <img src="/favicon.svg" alt="CoreStock" className="w-6 h-6" />
+              <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="CoreStock" className="w-6 h-6" />
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <img src="/logo.svg" alt="CoreStock" className="h-8" />
+              <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="CoreStock" className="h-8" />
             </div>
           )}
           <button className="btn" onClick={() => setCollapsed((v) => !v)}>
