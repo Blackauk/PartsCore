@@ -18,9 +18,9 @@ export function AppProvider({ children }) {
   return (
     <AppContext.Provider value={value}>
       {children}
-      <div className="fixed bottom-4 right-4 space-y-2">
+      <div className="fixed bottom-4 right-4 space-y-2 z-[100]">
         {toasts.map((t) => (
-          <div key={t.id} className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200">
+          <div key={t.id} className="px-3 py-2 bg-panel border border-base rounded-lg text-sm text-primary shadow-lg">
             {t.message}
           </div>
         ))}

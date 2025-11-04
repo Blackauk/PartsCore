@@ -35,17 +35,20 @@ export default function ModalRoot({ open, onClose, title, children, maxWidth = '
     >
       <div
         ref={contentRef}
-        className={`w-full ${maxWidth} bg-zinc-900 text-zinc-100 rounded-2xl border border-zinc-800 shadow-2xl max-h-[90vh] overflow-y-auto`}
+        className={`w-full ${maxWidth} bg-panel text-primary rounded-2xl border border-base shadow-2xl max-h-[90vh] overflow-y-auto`}
         onMouseDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
       >
-        <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-5 py-4 z-10">
-          <h2 className="text-lg font-semibold">{title}</h2>
+        <div className="sticky top-0 bg-panel border-b border-base flex items-center justify-between px-5 py-4 z-10">
+          <h2 id="modal-title" className="text-lg font-semibold text-primary">{title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg hover:bg-elevated flex items-center justify-center transition-colors"
             aria-label="Close"
           >
-            <X size={18} className="text-zinc-400" />
+            <X size={18} className="text-secondary" />
           </button>
         </div>
         <div className="p-5">{children}</div>

@@ -5,6 +5,10 @@ import Guard from '../../components/Guard.jsx';
 import ViewDrawer from '../../components/ViewDrawer.jsx';
 import EditModal from '../../components/EditModal.jsx';
 import TableCard from '../../components/TableCard.jsx';
+import SplitButton from '../../components/SplitButton.jsx';
+import UserModal from '../../components/modals/UserModal.jsx';
+import RoleModal from '../../components/modals/RoleModal.jsx';
+import { UserPlus, Shield } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore.js';
 
 const ROLE_COLORS = {
@@ -22,12 +26,15 @@ export default function UsersRoles() {
   const [rows, setRows] = useState(seedUsers);
   const [viewRow, setViewRow] = useState(null);
   const [editRow, setEditRow] = useState(null);
-  const [inviteOpen, setInviteOpen] = useState(false);
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [roles, setRoles] = useState(['Admin','Manager','Supervisor','Fitter','Viewer'].map((name, idx) => ({ id: name, name })));
+  const [pendingRoleSelect, setPendingRoleSelect] = useState(null);
   const currentRole = useAuthStore((s) => s.currentUser.role);
 
   useEffect(() => {
     function onKey(e) {
-      if (e.key === 'n' || e.key === 'N') setInviteOpen(true);
+      if (e.key === 'n' || e.key === 'N') setUserModalOpen(true);
       if (e.key === 'e' || e.key === 'E') handleExport();
       if (e.key === '/') { e.preventDefault(); const el = document.getElementById('users-search'); el?.focus(); }
     }
@@ -62,19 +69,45 @@ export default function UsersRoles() {
     setRows((rs) => rs.map((r) => (r.id === u.id ? { ...r, status: r.status === 'Active' ? 'Disabled' : 'Active' } : r)));
   }
 
-  function onInviteSubmit({ email, role, sites }) {
+  function onUserSave(payload) {
     const next = {
       id: `U-${Math.floor(1000 + Math.random()*9000)}`,
-      name: email.split('@')[0],
-      email,
-      role,
-      sites,
-      status: 'Active',
+      name: `${payload.firstName} ${payload.lastName}`,
+      email: payload.email,
+      role: roles.find(r => (r.id || r.name) === payload.roleId)?.name || payload.roleId,
+      sites: payload.siteIds || [],
+      status: payload.status === 'active' ? 'Active' : 'Disabled',
       lastLogin: '—',
     };
     setRows((r) => [next, ...r]);
-    setInviteOpen(false);
-    alert('Invitation sent (mock).');
+    setUserModalOpen(false);
+  }
+
+  function onRoleSave(payload) {
+    const newRole = {
+      id: payload.name,
+      name: payload.name,
+      description: payload.description,
+      permissions: payload.permissions,
+      isDefault: payload.isDefault,
+    };
+    setRoles((r) => [...r, newRole]);
+    setRoleModalOpen(false);
+    
+    // If this was opened from User modal, auto-select it and reopen user modal
+    if (pendingRoleSelect === 'pending') {
+      const roleId = newRole.id || newRole.name;
+      setPendingRoleSelect(roleId);
+      setUserModalOpen(true);
+    } else {
+      setPendingRoleSelect(null);
+    }
+  }
+
+  function handleCreateRoleFromUser() {
+    setUserModalOpen(false);
+    setPendingRoleSelect('pending'); // Mark that we're creating a role from user modal
+    setRoleModalOpen(true);
   }
 
   const columns = [
@@ -83,9 +116,9 @@ export default function UsersRoles() {
     { key: 'role', label: 'Role', render: (u) => (
       <span className={`inline-flex items-center gap-2 px-2 py-1 rounded border text-xs ${ROLE_COLORS[u.role] || ROLE_COLORS.Viewer}`}>{u.role}</span>
     ) },
-    { key: 'sites', label: 'Sites', render: (u) => (u.sites||[]).map(s => <span key={s} className="inline-block text-xs px-2 py-0.5 rounded bg-zinc-800 mr-1">{s}</span>) },
+    { key: 'sites', label: 'Sites', render: (u) => (u.sites||[]).map(s => <span key={s} className="inline-block text-xs px-2 py-0.5 rounded bg-elevated text-primary mr-1">{s}</span>) },
     { key: 'status', label: 'Status', render: (u) => (
-      <span className={`text-xs px-2 py-0.5 rounded ${u.status==='Active'?'bg-emerald-500/20 text-emerald-300':'bg-zinc-700 text-zinc-300'}`}>{u.status}</span>
+      <span className={`text-xs px-2 py-0.5 rounded ${u.status==='Active'?'badge-success':'badge-danger'}`}>{u.status}</span>
     ) },
     { key: 'lastLogin', label: 'Last Login' },
     { key: 'actions', label: 'Actions', render: (u) => (
@@ -115,7 +148,26 @@ export default function UsersRoles() {
           {(siteList||[]).map(s=> <option key={s.code} value={s.code}>{s.code}</option>)}
         </select>
         <Guard perm="ADMIN_USER" mode="disable">
-          <button className="btn" onClick={()=>setInviteOpen(true)} title={currentRole==='Viewer'?"No permission":undefined}>Invite User (N)</button>
+          <SplitButton
+            primaryAction={{
+              label: 'New',
+              icon: UserPlus,
+              onClick: () => setUserModalOpen(true),
+            }}
+            menuItems={[
+              {
+                label: 'Add New User',
+                icon: UserPlus,
+                onClick: () => setUserModalOpen(true),
+              },
+              {
+                label: 'Add New Role',
+                icon: Shield,
+                onClick: () => setRoleModalOpen(true),
+              },
+            ]}
+            disabled={currentRole === 'Viewer'}
+          />
         </Guard>
         <button className="btn" onClick={handleExport}>Export CSV (E)</button>
       </div>
@@ -125,12 +177,12 @@ export default function UsersRoles() {
       {viewRow && (
         <ViewDrawer title="User" onClose={()=>setViewRow(null)}>
           <div className="space-y-2 text-sm">
-            <div><span className="text-zinc-400">Name:</span> {viewRow.name}</div>
-            <div><span className="text-zinc-400">Email:</span> {viewRow.email}</div>
-            <div><span className="text-zinc-400">Role:</span> {viewRow.role}</div>
-            <div><span className="text-zinc-400">Sites:</span> {(viewRow.sites||[]).join(', ')}</div>
-            <div><span className="text-zinc-400">Status:</span> {viewRow.status}</div>
-            <div><span className="text-zinc-400">Last Login:</span> {viewRow.lastLogin}</div>
+            <div><span className="text-secondary">Name:</span> <span className="text-primary">{viewRow.name}</span></div>
+            <div><span className="text-secondary">Email:</span> <span className="text-primary">{viewRow.email}</span></div>
+            <div><span className="text-secondary">Role:</span> <span className="text-primary">{viewRow.role}</span></div>
+            <div><span className="text-secondary">Sites:</span> <span className="text-primary">{(viewRow.sites||[]).join(', ')}</span></div>
+            <div><span className="text-secondary">Status:</span> <span className="text-primary">{viewRow.status}</span></div>
+            <div><span className="text-secondary">Last Login:</span> <span className="text-primary">{viewRow.lastLogin}</span></div>
           </div>
         </ViewDrawer>
       )}
@@ -167,38 +219,31 @@ export default function UsersRoles() {
         </EditModal>
       )}
 
-      {inviteOpen && (
-        <EditModal title="Invite User" onClose={()=>setInviteOpen(false)} onSave={(vals)=>onInviteSubmit(vals)}>
-          <form className="space-y-3" onSubmit={(e)=>e.preventDefault()}>
-            <div className="space-y-1">
-              <label className="text-sm">Email</label>
-              <input type="email" className="input" name="email" placeholder="user@example.com" required />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm">Role</label>
-              <select className="input" name="role" defaultValue="Viewer">
-                {['Admin','Manager','Supervisor','Fitter','Viewer'].map(r=> <option key={r} value={r}>{r}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm">Sites</label>
-              <select multiple className="input min-h-[120px]" name="sites">
-                {(siteList||[]).map(s=> <option key={s.code} value={s.code}>{s.code}</option>)}
-              </select>
-            </div>
-            <div className="flex gap-2 justify-end">
-              <button type="button" className="btn" onClick={()=>setInviteOpen(false)}>Cancel</button>
-              <button type="submit" className="btn" onClick={(e)=>{
-                const form = e.currentTarget.closest('form');
-                const email = form.email.value.trim();
-                const role = form.role.value;
-                const sites = Array.from(form.sites.selectedOptions).map(o=>o.value);
-                onInviteSubmit({ email, role, sites });
-              }}>Send Invite</button>
-            </div>
-          </form>
-        </EditModal>
-      )}
+      <UserModal
+        open={userModalOpen}
+        onClose={() => {
+          setUserModalOpen(false);
+          setPendingRoleSelect(null);
+        }}
+        onSave={onUserSave}
+        roles={roles}
+        sites={siteList || []}
+        teams={[]}
+        onCreateRole={handleCreateRoleFromUser}
+        pendingRoleSelect={pendingRoleSelect}
+      />
+
+      <RoleModal
+        open={roleModalOpen}
+        onClose={() => {
+          setRoleModalOpen(false);
+          if (pendingRoleSelect === 'pending') {
+            setPendingRoleSelect(null);
+          }
+        }}
+        onSave={onRoleSave}
+        existingRoles={roles}
+      />
     </div>
   );
 }
