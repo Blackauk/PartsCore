@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../../lib/auth.js';
 import AuthLayout from '../../components/AuthLayout.jsx';
 import FormField from '../../components/FormField.jsx';
@@ -197,9 +197,9 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-zinc-400">
             Already have an account?{' '}
-            <a href="/login" className="text-brand-orange hover:underline">
+            <Link to="/login" className="text-brand-orange hover:underline">
               Sign in
-            </a>
+            </Link>
           </p>
         </form>
       </div>

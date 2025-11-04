@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { login, verifyMfa, getMe } from '../../lib/auth.js';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import AuthLayout from '../../components/AuthLayout.jsx';
@@ -247,12 +247,12 @@ export default function LoginPage() {
                 />
                 <span>Remember me</span>
               </label>
-              <a
-                href="/forgot-password"
+              <Link
+                to="/forgot-password"
                 className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button
@@ -265,9 +265,9 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-zinc-400">
               Don't have an account?{' '}
-              <a href="/register" className="text-brand-orange hover:underline">
+              <Link to="/register" className="text-brand-orange hover:underline">
                 Sign up
-              </a>
+              </Link>
             </p>
           </form>
         ) : (

@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { Home } from 'lucide-react';
 
@@ -66,13 +66,13 @@ function ForbiddenScreen() {
             You don't have permission to access this page. Please contact your administrator if you believe this is an error.
           </p>
         </div>
-        <a
-          href="/dashboard"
+        <Link
+          to="/dashboard"
           className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 rounded-lg transition-colors"
         >
           <Home size={16} />
           Back to Dashboard
-        </a>
+        </Link>
       </div>
     </div>
   );

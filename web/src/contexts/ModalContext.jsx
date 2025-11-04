@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ModalRoot from '../components/ModalRoot.jsx';
 import ProfileModal, { ProfileModalContent } from '../components/modals/ProfileModal.jsx';
 import NotificationsModal from '../components/modals/NotificationsModal.jsx';
@@ -15,6 +16,7 @@ const ModalContext = createContext(null);
 
 export function ModalProvider({ children }) {
   const [activeModal, setActiveModal] = useState(null);
+  const navigate = useNavigate();
   const authStoreSignOut = useAuthStore((s) => s.signOut);
   const { signOut: authSignOut } = useAuth();
 
@@ -82,7 +84,7 @@ export function ModalProvider({ children }) {
               // Sign out from both auth systems for compatibility
               await authSignOut();
               authStoreSignOut();
-              window.location.href = '/login';
+              navigate('/login');
             }} 
           />
         </ModalRoot>

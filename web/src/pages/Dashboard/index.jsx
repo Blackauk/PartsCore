@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import KpiCard from '../../components/KpiCard.jsx';
 import Card from '../../components/Card.jsx';
 import TableMini from '../../components/TableMini.jsx';
@@ -177,7 +177,7 @@ export default function CommandCenter() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <Card title="Recent Stock Movements" action={<a className="link" href="/reports/transactions">View all</a>}>
+        <Card title="Recent Stock Movements" action={<Link className="link" to="/reports/transactions">View all</Link>}>
           <RecentFeed items={data.recentMovements} />
         </Card>
         <Card title="Top 10 Used Parts (30d)">

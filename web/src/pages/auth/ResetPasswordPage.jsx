@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { resetPassword } from '../../lib/auth.js';
 import AuthLayout from '../../components/AuthLayout.jsx';
 import FormField from '../../components/FormField.jsx';
@@ -82,12 +82,12 @@ export default function ResetPasswordPage() {
           <p className="text-sm text-zinc-400 mb-4">
             This password reset link is invalid or has expired. Please request a new one.
           </p>
-          <a
-            href="/forgot-password"
+          <Link
+            to="/forgot-password"
             className="inline-block px-4 py-2 bg-brand-orange hover:bg-brand-orange/90 text-white font-medium rounded-lg transition-colors"
           >
             Request New Reset Link
-          </a>
+          </Link>
         </div>
       </AuthLayout>
     );
@@ -190,9 +190,9 @@ export default function ResetPasswordPage() {
           </button>
 
           <p className="text-center text-sm text-zinc-400">
-            <a href="/login" className="text-brand-orange hover:underline">
+            <Link to="/login" className="text-brand-orange hover:underline">
               Back to login
-            </a>
+            </Link>
           </p>
         </form>
       </div>

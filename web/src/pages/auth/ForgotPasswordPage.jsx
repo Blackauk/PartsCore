@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
 import { forgotPassword } from '../../lib/auth.js';
 import AuthLayout from '../../components/AuthLayout.jsx';
 import FormField from '../../components/FormField.jsx';
@@ -53,12 +54,12 @@ export default function ForgotPasswordPage() {
           <p className="text-sm text-zinc-400">
             If an account exists with this email, we've sent a password reset link. Please check your inbox and follow the instructions.
           </p>
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className="inline-block mt-4 text-sm text-brand-orange hover:underline"
           >
             Back to login
-          </a>
+          </Link>
         </div>
       </AuthLayout>
     );
@@ -109,9 +110,9 @@ export default function ForgotPasswordPage() {
 
           <p className="text-center text-sm text-zinc-400">
             Remember your password?{' '}
-            <a href="/login" className="text-brand-orange hover:underline">
+            <Link to="/login" className="text-brand-orange hover:underline">
               Sign in
-            </a>
+            </Link>
           </p>
         </form>
       </div>

@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta http-equiv="refresh" content="0; url=/PartsCore/">
+<script>
+  // Redirect preserves deep links inside /PartsCore/
+  const base = '/PartsCore/';
+  const path = location.pathname.startsWith(base)
+    ? location.pathname.slice(base.length)
+    : '';
+  location.replace(base + path + location.search + location.hash);
+</script>
+

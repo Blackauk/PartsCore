@@ -65,8 +65,11 @@ import ItemEdit from './pages/catalog/ItemEdit.jsx';
 import History from './pages/inventory/History.jsx';
 
 export default function AppRoutes() {
+  // Get basename from Vite's BASE_URL (matches vite.config.js base: '/PartsCore/')
+  const basename = import.meta.env.BASE_URL || '/PartsCore/';
+  
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         {/* Public auth routes */}
         <Route path="/login" element={<LoginPage />} />
