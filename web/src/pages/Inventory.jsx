@@ -2,14 +2,13 @@
 import { Outlet } from 'react-router-dom';
 import TabbedLayout from '../components/TabbedLayout.jsx';
 import { PageControlsProvider, usePageControls } from '../contexts/PageControlsContext.jsx';
+import { INVENTORY_TABS } from '../constants/inventoryTabs.js';
 
-const tabs = [
-  { label: 'Master List', to: '/inventory' },
-  { label: 'Items', to: '/inventory/items' },
-  { label: 'Catalog', to: '/inventory/catalog' },
-  { label: 'Low-Stock', to: '/inventory/low-stock' },
-  { label: 'Fast-Movers', to: '/inventory/fast-movers' },
-];
+// Use INVENTORY_TABS as single source of truth, excluding Movements (it's a separate section)
+// Movements is included in sidebar but not in tabs row
+const tabs = INVENTORY_TABS
+  .filter(tab => tab.key !== 'movements') // Movements is separate section, not in tab row
+  .map(tab => ({ label: tab.label, to: tab.path }));
 
 function InventoryContent() {
   const { controls } = usePageControls();

@@ -3,6 +3,8 @@
  * Returns navigation items based on user roles and permissions
  */
 
+import { INVENTORY_TABS } from '../constants/inventoryTabs.js';
+
 export function getSidebarNav(user) {
   const can = (perm) => {
     if (!perm) return true;
@@ -34,12 +36,12 @@ export function getSidebarNav(user) {
       path: '/inventory',
       icon: 'Boxes',
       perm: 'inventory.read',
-      children: [
-        { label: 'Master List', path: '/inventory', perm: 'inventory.read' },
-        { label: 'Catalog', path: '/inventory/catalog', perm: 'inventory.read' },
-        { label: 'Stock', path: '/inventory/items', perm: 'inventory.read' },
-        { label: 'Movements', path: '/movements', perm: 'inventory.read' },
-      ]
+      // Use INVENTORY_TABS as single source of truth
+      children: INVENTORY_TABS.map(tab => ({
+        label: tab.label,
+        path: tab.path,
+        perm: 'inventory.read'
+      }))
     },
     {
       label: 'Procurement',

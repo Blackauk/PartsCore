@@ -29,6 +29,7 @@ import Catalog from './pages/inventory/Catalog.jsx';
 import LowStock from './pages/inventory/LowStock.jsx';
 import FastMovers from './pages/inventory/FastMovers.jsx';
 import MasterList from './pages/inventory/MasterList.jsx';
+import Stock from './pages/inventory/Stock.jsx';
 
 // Locations sub-pages
 import SitesPage from './pages/locations/Sites.jsx';
@@ -93,12 +94,15 @@ export default function AppRoutes() {
                   </Route>
 
                   <Route path="/inventory" element={<Inventory />}>
-                    <Route index element={<MasterList />} />
-                    <Route path="master" element={<MasterList />} />
+                    <Route index element={<Navigate to="/inventory/master-list" replace />} />
+                    <Route path="master-list" element={<MasterList />} />
+                    <Route path="master" element={<Navigate to="/inventory/master-list" replace />} />
                     <Route path="items" element={<Items />} />
                     <Route path="catalog" element={<Catalog />} />
+                    <Route path="stock" element={<Stock />} />
                     <Route path="low-stock" element={<LowStock />} />
                     <Route path="fast-movers" element={<FastMovers />} />
+                    <Route path="movements" element={<Navigate to="/movements" replace />} />
                     <Route path="history" element={<History />} />
                   </Route>
                   

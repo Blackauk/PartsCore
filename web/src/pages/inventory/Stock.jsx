@@ -1,14 +1,11 @@
-// Updated: Move controls to tab row and remove redundant title
-import { useMemo, useState, useEffect } from 'react';
-import { Plus, Search, Edit3 } from 'lucide-react';
+// Stock page - Live stock view with filtering
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { Search, Edit3 } from 'lucide-react';
 import TableCard from '../../components/TableCard.jsx';
 import EditModal from '../../components/EditModal.jsx';
 import { items as allItems } from '../../data/mockInventory.js';
 import { useApp } from '../../context/AppContext.jsx';
-import CSVModal from '../../components/CSVModal.jsx';
-import CsvMenuButton from '../../components/CsvMenuButton.jsx';
 import { usePageControls } from '../../contexts/PageControlsContext.jsx';
-import { exportToCSV } from '../../utils/csvUtils.js';
 
 function StatusBadge({ stock, min }) {
   let status = 'In Stock';
@@ -29,19 +26,7 @@ function StatusBadge({ stock, min }) {
   );
 }
 
-function SkeletonRow() {
-  return (
-    <tr>
-      {Array.from({ length: 8 }).map((_, i) => (
-        <td key={i} className="px-4 py-3">
-          <div className="h-4 bg-zinc-800 rounded animate-pulse" />
-        </td>
-      ))}
-    </tr>
-  );
-}
-
-export default function Items() {
+export default function Stock() {
   const { toast } = useApp();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -49,42 +34,79 @@ export default function Items() {
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [importOpen, setImportOpen] = useState(false);
   const pageSize = 10;
+  
+  // Use refs to prevent infinite loops
+  const prevFiltersRef = useRef({ search: '', category: '' });
+  const abortControllerRef = useRef(null);
 
-  // Simulate data loading
+  // Simulate data loading with cancellation
   useEffect(() => {
+    // Cancel previous request if still pending
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+    
+    setLoading(true);
     const timer = setTimeout(() => {
       try {
-        // Mock API call
-        setLoading(false);
-        setError(null);
+        if (!signal.aborted) {
+          setLoading(false);
+          setError(null);
+        }
       } catch (err) {
-        setError('Failed to load inventory items');
-        setLoading(false);
+        if (!signal.aborted) {
+          setError('Failed to load stock data');
+          setLoading(false);
+        }
       }
     }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    
+    return () => {
+      clearTimeout(timer);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []); // Only run on mount/unmount
 
+  // Safe defaults
   const items = useMemo(() => allItems || [], []);
   
+  // Filter with stable dependencies
   const filtered = useMemo(() => {
-    return items.filter((r) =>
+    // Check if filters actually changed to prevent unnecessary recalculations
+    const currentFilters = { search, category };
+    const filtersChanged = 
+      prevFiltersRef.current.search !== search ||
+      prevFiltersRef.current.category !== category;
+    
+    if (!filtersChanged && prevFiltersRef.current.items === items) {
+      return prevFiltersRef.current.filtered || [];
+    }
+    
+    prevFiltersRef.current = { search, category, items };
+    
+    const result = items.filter((r) =>
       (!category || r.category === category) && (
         search === '' ||
         (r.sku || '').toLowerCase().includes(search.toLowerCase()) ||
         (r.name || '').toLowerCase().includes(search.toLowerCase())
       )
     );
+    
+    prevFiltersRef.current.filtered = result;
+    return result;
   }, [search, category, items]);
 
   const start = page * pageSize;
   const paged = filtered.slice(start, start + pageSize);
   const pageCount = Math.ceil(filtered.length / pageSize) || 1;
 
-  // Define columns as stable reference
-  const columns = useMemo(() => [
+  const columns = [
     { key: 'sku', label: 'Part No.', render: (r) => r.sku || '—' },
     { key: 'name', label: 'Description', render: (r) => r.name || '—' },
     { key: 'stock', label: 'Stock (On hand)', render: (r) => r.stock ?? 0 },
@@ -97,7 +119,7 @@ export default function Items() {
         <Edit3 size={16} />
       </button>
     ) },
-  ], []);
+  ];
 
   const handleRetry = () => {
     setError(null);
@@ -107,20 +129,6 @@ export default function Items() {
       setError(null);
     }, 500);
   };
-
-  // Define handleExport as stable callback
-  const handleExportCallback = useMemo(() => {
-    return () => {
-      const headers = ['sku', 'name', 'stock', 'uom', 'min', 'location', 'status'];
-      const rows = filtered.length ? filtered : [];
-      if (rows.length === 0) {
-        const templateHeaders = ['sku','name','stock','uom','min','location','status'];
-        exportToCSV('items_template.csv', templateHeaders, []);
-      } else {
-        exportToCSV('items_data.csv', headers, rows);
-      }
-    };
-  }, [filtered]);
 
   // Register controls with parent (stable dependencies)
   const controls = useMemo(() => (
@@ -150,33 +158,24 @@ export default function Items() {
           }}
         />
       </div>
-      <button className="btn" onClick={() => toast('Feature coming soon', 'info')}>
-        <Plus size={16} />
-        <span className="hidden sm:inline">Add New</span>
-      </button>
-      <CsvMenuButton
-        onExport={handleExportCallback}
-        onImport={() => setImportOpen(true)}
-      />
     </>
-  ), [search, category, items, toast, handleExportCallback]);
+  ), [search, category, items]);
   
   usePageControls(controls);
 
   return (
     <div className="space-y-3">
       <TableCard columns={columns} rows={paged} isLoading={loading} error={error} onRetry={handleRetry} />
-      <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit Item" />
-      <CSVModal
-        open={importOpen}
-        onClose={() => setImportOpen(false)}
-        onImport={(rows) => {
-          toast(`${rows.length} items imported (mock)`);
-          console.log('Imported rows (mock):', rows);
-        }}
-      />
+      <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit Stock Item" />
+
+      <div className="flex items-center justify-between text-sm text-zinc-400">
+        <span>Page {page + 1} of {pageCount}</span>
+        <div className="flex gap-2">
+          <button className="btn" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>Prev</button>
+          <button className="btn" onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))} disabled={page >= pageCount - 1}>Next</button>
+        </div>
+      </div>
     </div>
   );
 }
- 
 

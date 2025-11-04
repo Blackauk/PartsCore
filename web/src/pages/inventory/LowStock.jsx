@@ -72,7 +72,7 @@ export default function LowStock() {
   return (
     <div className="space-y-4">
       <TableCard columns={columns} rows={paged} />
-      <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit Low-Stock" />
+      <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit Low Stock" />
 
       <div className="flex items-center justify-between text-sm text-zinc-400">
         <span>Page {page + 1} of {pageCount}</span>
