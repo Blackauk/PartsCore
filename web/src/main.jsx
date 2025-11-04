@@ -4,6 +4,7 @@ import { BrowserRouter, HashRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import { AppProvider } from './context/AppContext.jsx'
+import { SettingsProvider } from './context/SettingsContext.jsx'
 import { ModalProvider } from './contexts/ModalContext.jsx'
 import { AuthProvider as LegacyAuthProvider } from './contexts/AuthContext.jsx'
 import { AuthProvider } from './auth/AuthContext.jsx'
@@ -25,11 +26,13 @@ bootstrapDataLayer().then(() => {
       <RouterImpl {...(basename ? { basename } : {})}>
         <AuthProvider>
           <LegacyAuthProvider>
-            <AppProvider>
-              <ModalProvider>
-                <App />
-              </ModalProvider>
-            </AppProvider>
+            <SettingsProvider>
+              <AppProvider>
+                <ModalProvider>
+                  <App />
+                </ModalProvider>
+              </AppProvider>
+            </SettingsProvider>
           </LegacyAuthProvider>
         </AuthProvider>
       </RouterImpl>

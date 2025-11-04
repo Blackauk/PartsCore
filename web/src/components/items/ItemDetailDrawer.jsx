@@ -8,6 +8,8 @@ import {
 import { getStockStatus, getStockStatusColor } from '../../lib/catalogue.js';
 import Dropzone from '../Dropzone.jsx';
 import { useApp } from '../../context/AppContext.jsx';
+import { formatCurrency } from '../../lib/currency.js';
+import { useSettings } from '../../context/SettingsContext.jsx';
 
 export default function ItemDetailDrawer({ 
   isOpen, 
@@ -22,6 +24,7 @@ export default function ItemDetailDrawer({
 }) {
   const navigate = useNavigate();
   const { toast } = useApp();
+  const { settings } = useSettings();
   const [activeTab, setActiveTab] = useState('overview');
   const [item, setItem] = useState(initialItem);
   const [attachments, setAttachments] = useState([]);
@@ -431,7 +434,7 @@ export default function ItemDetailDrawer({
                           </td>
                           <td className="px-3 py-2 text-sm font-mono">{sup.supplierId}</td>
                           <td className="px-3 py-2 text-sm">{sup.leadTimeDays || '—'}d</td>
-                          <td className="px-3 py-2 text-sm">{sup.lastPrice ? `£${sup.lastPrice.toFixed(2)}` : '—'}</td>
+                          <td className="px-3 py-2 text-sm">{sup.lastPrice ? formatCurrency(sup.lastPrice, settings.currency, 2) : '—'}</td>
                           <td className="px-3 py-2 text-sm text-zinc-400 max-w-xs truncate">{sup.notes || '—'}</td>
                           <td className="px-3 py-2 text-center">
                             <button className="btn-secondary text-xs px-2 py-1">

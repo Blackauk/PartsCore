@@ -8,11 +8,14 @@ import { purchaseOrders } from '../../data/mockProcurement.js';
 import { exportPOToPdf } from '../../lib/pdf.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { toast } from '../../lib/toast.js';
+import { formatCurrency } from '../../lib/currency.js';
+import { useSettings } from '../../context/SettingsContext.jsx';
 
 export default function PODetail() {
   const { poId } = useParams();
   const navigate = useNavigate();
   const currentUser = useAuthStore((s) => s.currentUser);
+  const { settings } = useSettings();
   const [isExporting, setIsExporting] = useState(false);
   const [attachments, setAttachments] = useState([]);
 
@@ -81,8 +84,8 @@ export default function PODetail() {
     { key: 'qty', label: 'Qty Ordered' },
     { key: 'qtyReceived', label: 'Received', render: (r) => r.qtyReceived || 0 },
     { key: 'qtyRemaining', label: 'Outstanding', render: (r) => r.qtyRemaining || (r.qty - (r.qtyReceived || 0)) },
-    { key: 'unitPrice', label: 'Unit Price', render: (r) => r.unitPrice ? `£${r.unitPrice.toFixed(2)}` : '-' },
-    { key: 'lineTotal', label: 'Total', render: (r) => r.lineTotal ? `£${r.lineTotal.toFixed(2)}` : '-' },
+    { key: 'unitPrice', label: 'Unit Price', render: (r) => r.unitPrice ? formatCurrency(r.unitPrice, settings.currency, 2) : '-' },
+    { key: 'lineTotal', label: 'Total', render: (r) => r.lineTotal ? formatCurrency(r.lineTotal, settings.currency, 2) : '-' },
   ];
 
   if (!po) {
@@ -165,7 +168,7 @@ export default function PODetail() {
             </div>
             <div>
               <div className="text-xs text-zinc-400 mb-1">Total Value</div>
-              <div className="font-medium">£{po.lines?.reduce((sum, l) => sum + (l.lineTotal || l.qty * (l.unitPrice || 0)), 0).toFixed(2) || '0.00'}</div>
+              <div className="font-medium">{formatCurrency(po.lines?.reduce((sum, l) => sum + (l.lineTotal || l.qty * (l.unitPrice || 0)), 0) || 0, settings.currency, 2)}</div>
             </div>
           </div>
         </div>

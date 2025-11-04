@@ -1,13 +1,16 @@
 import StatCard from '../components/StatCard.jsx';
 import TableCard from '../components/TableCard.jsx';
 import { mock } from '../data/mock.js';
-import { formatCurrency, formatNumber } from '../lib/formatters.js';
+import { formatNumber } from '../lib/formatters.js';
+import { formatCurrency } from '../lib/currency.js';
+import { useSettings } from '../context/SettingsContext.jsx';
 
 export default function Dashboard() {
+  const { settings } = useSettings();
   const { stockValue, lowStock, inboundPOs, recentMovements, fastMovers, ageing, compliance } = mock();
   return (
     <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
-      <StatCard title="Stock Value" value={formatCurrency(stockValue.total)} subtitle={`${stockValue.change >= 0 ? '+' : ''}${stockValue.change}% vs 30d`} trend={stockValue.change} />
+      <StatCard title="Stock Value" value={formatCurrency(stockValue.total, settings.currency, 0)} subtitle={`${stockValue.change >= 0 ? '+' : ''}${stockValue.change}% vs 30d`} trend={stockValue.change} />
       <StatCard title="Low-Stock Alerts" value={formatNumber(lowStock.count)} subtitle="Below threshold" />
       <StatCard title="Outstanding POs" value={formatNumber(inboundPOs.count)} subtitle="Due this week" />
       <StatCard title="Ageing > 90d" value={formatNumber(ageing.count)} subtitle="No movement" />

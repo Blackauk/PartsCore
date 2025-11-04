@@ -1,8 +1,10 @@
 import { useMemo, useRef, useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip as ReTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LineChart, Line, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip as ReTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LineChart, Line, CartesianGrid, AreaChart, Area } from 'recharts';
 import { kpis, stockByCategory, stockBySite, topIssued, usageTrend, supplierOnTimeTrend } from '../../data/mockReports.js';
 import StatCard from '../../components/StatCard.jsx';
 import { exportToCSV } from '../../utils/csvUtils.js';
+import { formatCurrency } from '../../lib/currency.js';
+import { useSettings } from '../../context/SettingsContext.jsx';
 
 const COLORS = ['#60a5fa','#34d399','#fbbf24','#f472b6','#a78bfa','#fb7185','#22d3ee','#fde047'];
 
@@ -26,14 +28,23 @@ function downloadChartPNG(container) {
   img.src = 'data:image/svg+xml;base64,' + svg64;
 }
 
+/** @typedef {'received' | 'issued' | 'both'} SeriesView */
+
 export default function Analytics() {
+  const { settings } = useSettings();
   const [range, setRange] = useState('30');
+  const [usageView, setUsageView] = useState(/** @type {SeriesView} */('both'));
   const pieRef = useRef(null);
   const barRef = useRef(null);
   const siteRef = useRef(null);
   const lineRef = useRef(null);
 
   const top10 = useMemo(() => topIssued.slice(0, 10), []);
+
+  const usageLegendPayload = useMemo(() => ([
+    { value: 'Received', type: 'square', color: '#4f46e5', id: 'received' },
+    { value: 'Issued', type: 'square', color: '#06b6d4', id: 'issued' },
+  ]), []);
 
   return (
     <div className="space-y-6">
@@ -49,7 +60,7 @@ export default function Analytics() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard title="Total Stock Value" value={kpis.totalStockValue} format="currency" />
+        <StatCard title="Total Stock Value" value={formatCurrency(kpis.totalStockValue, settings.currency, 0)} />
         <StatCard title="Low-Stock Count" value={kpis.lowStockCount} />
         <StatCard title="Open POs" value={kpis.openPOs} />
         <StatCard title="Returns (30d)" value={kpis.returns30d} />
@@ -70,7 +81,15 @@ export default function Analytics() {
                 <Pie data={stockByCategory} dataKey="value" nameKey="category" cx="50%" cy="50%" outerRadius={100}>
                   {stockByCategory.map((_, i)=>(<Cell key={i} fill={COLORS[i%COLORS.length]} />))}
                 </Pie>
-                <ReTooltip />
+                <ReTooltip
+                  contentStyle={{ 
+                    background: 'var(--bg-panel)', 
+                    border: '1px solid var(--border-color)', 
+                    color: 'var(--text-primary)',
+                    borderRadius: '8px'
+                  }}
+                  formatter={(value) => [formatCurrency(Number(value), settings.currency, 0)]}
+                />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -107,8 +126,25 @@ export default function Analytics() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stockBySite}>
-                <XAxis dataKey="site" /><YAxis />
-                <ReTooltip />
+                <XAxis 
+                  dataKey="site" 
+                  stroke="var(--text-secondary)"
+                  tick={{ fill: 'var(--text-secondary)' }}
+                />
+                <YAxis
+                  stroke="var(--text-secondary)"
+                  tick={{ fill: 'var(--text-secondary)' }}
+                  tickFormatter={(v) => formatCurrency(Number(v), settings.currency, 0)}
+                />
+                <ReTooltip
+                  contentStyle={{ 
+                    background: 'var(--bg-panel)', 
+                    border: '1px solid var(--border-color)', 
+                    color: 'var(--text-primary)',
+                    borderRadius: '8px'
+                  }}
+                  formatter={(value) => [formatCurrency(Number(value), settings.currency, 0)]}
+                />
                 <Bar dataKey="value" stackId="a" fill="#34d399" />
               </BarChart>
             </ResponsiveContainer>
@@ -116,23 +152,82 @@ export default function Analytics() {
         </div>
 
         <div className="card p-4" ref={lineRef}>
-          <div className="flex items-center gap-2 mb-2">
-            <h2 className="font-medium">Usage Trend (90d)</h2>
-            <div className="ml-auto flex gap-2">
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="font-medium text-primary">Usage Trend (90d)</h2>
+            <div className="ml-auto flex items-center gap-2">
+              {/* Segmented toggle */}
+              <div role="tablist" aria-label="Series view" className="inline-flex rounded-lg border border-base overflow-hidden">
+                {(['both','received','issued']).map((opt) => (
+                  <button
+                    key={opt}
+                    role="tab"
+                    aria-selected={usageView === opt}
+                    onClick={() => setUsageView(/** @type {SeriesView} */(opt))}
+                    className={`px-3 py-1.5 text-sm transition-colors ${
+                      usageView === opt 
+                        ? 'btn-primary' 
+                        : 'bg-panel text-secondary hover:bg-elevated'
+                    }`}
+                    style={usageView === opt ? {} : { borderRight: '1px solid var(--border-color)' }}
+                  >
+                    {opt === 'both' ? 'Both' : opt[0].toUpperCase() + opt.slice(1)}
+                  </button>
+                ))}
+              </div>
               <button className="btn" onClick={()=>downloadChartPNG(lineRef.current)}>Export PNG</button>
               <button className="btn" onClick={()=>exportToCSV('usage_trend.csv',['date','issues','receipts'],usageTrend)}>Export CSV</button>
             </div>
           </div>
-          <div className="h-72">
+          <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={usageTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" hide />
-                <YAxis />
-                <ReTooltip />
-                <Line type="monotone" dataKey="issues" stroke="#fb7185" dot={false} />
-                <Line type="monotone" dataKey="receipts" stroke="#60a5fa" dot={false} />
-              </LineChart>
+              <AreaChart data={usageTrend} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="4 4" stroke="var(--border-color)" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="var(--text-secondary)"
+                  tick={{ fill: 'var(--text-secondary)' }}
+                />
+                <YAxis
+                  stroke="var(--text-secondary)"
+                  tick={{ fill: 'var(--text-secondary)' }}
+                  tickFormatter={(v) => formatCurrency(Number(v), settings.currency, 0)}
+                />
+                <ReTooltip
+                  contentStyle={{ 
+                    background: 'var(--bg-panel)', 
+                    border: '1px solid var(--border-color)', 
+                    color: 'var(--text-primary)',
+                    borderRadius: '8px'
+                  }}
+                  formatter={(value) => [formatCurrency(Number(value), settings.currency, 0)]}
+                />
+                <Legend 
+                  payload={usageLegendPayload} 
+                  wrapperStyle={{ color: 'var(--text-secondary)', paddingTop: '8px' }}
+                />
+                {(usageView === 'both' || usageView === 'received') && (
+                  <Area 
+                    type="monotone" 
+                    dataKey="receipts" 
+                    name="Received" 
+                    stroke="#4f46e5" 
+                    fill="#4f46e5" 
+                    fillOpacity={0.2}
+                    stackId={usageView === 'both' ? 'a' : undefined}
+                  />
+                )}
+                {(usageView === 'both' || usageView === 'issued') && (
+                  <Area 
+                    type="monotone" 
+                    dataKey="issues" 
+                    name="Issued" 
+                    stroke="#06b6d4" 
+                    fill="#06b6d4" 
+                    fillOpacity={0.2}
+                    stackId={usageView === 'both' ? 'a' : undefined}
+                  />
+                )}
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
