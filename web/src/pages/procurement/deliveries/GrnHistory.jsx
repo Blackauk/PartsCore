@@ -6,6 +6,7 @@ import { Search } from 'lucide-react';
 import TableCard from '../../../components/TableCard.jsx';
 import ViewDrawer from '../../../components/ViewDrawer.jsx';
 import DocTag from '../../../components/DocTag.jsx';
+import Tooltip from '../../../components/Tooltip.jsx';
 import { grnHistory } from '../../../data/mockDeliveries.js';
 import { exportToCSV } from '../../../utils/csvUtils.js';
 import { Link } from 'react-router-dom';
@@ -27,7 +28,15 @@ export default function GrnHistory() {
   ), [search, status, history]);
 
   const columns = [
-    { key: 'id', label: 'GRN', render: (r) => <Link to={`/procurement/deliveries/${r.id}`} className="link">{r.id}</Link> },
+    { 
+      key: 'id', 
+      label: (
+        <Tooltip content="Goods Received Note" delay={300} visibleDuration={5000}>
+          <span>GRN</span>
+        </Tooltip>
+      ), 
+      render: (r) => <Link to={`/procurement/deliveries/${r.id}`} className="link">{r.id}</Link> 
+    },
     { key: 'poId', label: 'PO' },
     { key: 'supplier', label: 'Supplier' },
     { key: 'date', label: 'Date Received' },

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 const PageControlsContext = createContext(null);
 
@@ -14,13 +14,20 @@ export function PageControlsProvider({ children }) {
 
 export function usePageControls(initialControls = null) {
   const { setControls } = useContext(PageControlsContext);
+  const prevControlsRef = useRef(null);
   
   useEffect(() => {
-    if (initialControls !== null) {
+    // Only update if controls actually changed (reference equality check)
+    // This prevents infinite loops when JSX elements are recreated
+    if (initialControls !== null && prevControlsRef.current !== initialControls) {
+      prevControlsRef.current = initialControls;
       setControls?.(initialControls);
     }
     return () => {
-      setControls?.(null);
+      if (prevControlsRef.current === initialControls) {
+        setControls?.(null);
+        prevControlsRef.current = null;
+      }
     };
   }, [setControls, initialControls]);
 

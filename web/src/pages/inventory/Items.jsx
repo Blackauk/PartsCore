@@ -66,19 +66,10 @@ export default function Items() {
   const abortControllerRef = useRef(null);
   const prevFiltersRef = useRef({ search: '', category: '' });
   const debounceTimerRef = useRef(null);
-  const rendersRef = useRef(0);
 
-  // Render counter for debugging (temporary)
-  rendersRef.current++;
-  if (rendersRef.current % 50 === 0) {
-    console.debug('[Inventory/Items] renders:', rendersRef.current);
-  }
-
-  // Mount/unmount logging for debugging
+  // Cleanup on unmount
   useEffect(() => {
-    console.debug('[Inventory/Items] mounted');
     return () => {
-      console.debug('[Inventory/Items] unmounted');
       // Cleanup: abort any pending requests
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -194,21 +185,33 @@ export default function Items() {
     }, 500);
   };
 
-  // Define handleExport as stable callback
-  const handleExportCallback = useMemo(() => {
-    return () => {
-      const headers = ['sku', 'name', 'stock', 'uom', 'min', 'location', 'status'];
-      const rows = filtered.length ? filtered : [];
-      if (rows.length === 0) {
-        const templateHeaders = ['sku','name','stock','uom','min','location','status'];
-        exportToCSV('items_template.csv', templateHeaders, []);
-      } else {
-        exportToCSV('items_data.csv', headers, rows);
-      }
-    };
-  }, [filtered]);
 
   // Register controls with parent (stable dependencies)
+  // Memoize categories list to prevent unnecessary recalculations
+  const categories = useMemo(() => 
+    Array.from(new Set(items.map((i) => i.category).filter(Boolean))),
+    [items]
+  );
+
+  // Stabilize handleExport to prevent control re-renders
+  const stableHandleExport = useCallback(() => {
+    const headers = ['sku', 'name', 'stock', 'uom', 'min', 'location', 'status'];
+    const rows = filtered.length ? filtered : [];
+    if (rows.length === 0) {
+      const templateHeaders = ['sku','name','stock','uom','min','location','status'];
+      exportToCSV('items_template.csv', templateHeaders, []);
+    } else {
+      exportToCSV('items_data.csv', headers, rows);
+    }
+  }, [filtered]);
+
+  // Stabilize handleImport to prevent control re-renders
+  const stableHandleImport = useCallback(() => {
+    setImportOpen(true);
+  }, []);
+
+  // Register controls - memoize to prevent infinite loops
+  // Only recreate when search, category, or categories list actually changes
   const controls = useMemo(() => (
     <>
       <label htmlFor="items-category-select" className="sr-only">Filter by category</label>
@@ -223,7 +226,7 @@ export default function Items() {
         }}
       >
         <option value="">All Categories</option>
-        {Array.from(new Set(items.map((i) => i.category).filter(Boolean))).map((c) => (
+        {categories.map((c) => (
           <option key={c} value={c}>{c}</option>
         ))}
       </select>
@@ -248,11 +251,11 @@ export default function Items() {
         <span className="hidden sm:inline">Add New</span>
       </button>
       <CsvMenuButton
-        onExport={handleExportCallback}
-        onImport={() => setImportOpen(true)}
+        onExport={stableHandleExport}
+        onImport={stableHandleImport}
       />
     </>
-  ), [search, category, items, toast, handleExportCallback, setPage]);
+  ), [search, category, categories, toast, stableHandleExport, stableHandleImport]);
   
   usePageControls(controls);
 
