@@ -1,14 +1,15 @@
 // Root cause: TabbedLayout didn't render <Outlet/>, so child pages never mounted. Data was also not safely defaulted.
 // Fix: Added <Outlet/> to TabbedLayout. Added safe array defaults.
 
-import { useMemo, useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { useMemo, useState, useRef } from 'react';
+import { Plus, Search, Eye, Edit } from 'lucide-react';
 import TableCard from '../../components/TableCard.jsx';
-import ViewDrawer from '../../components/ViewDrawer.jsx';
-import EditModal from '../../components/EditModal.jsx';
 import RatingStars from '../../components/RatingStars.jsx';
 import DocTag from '../../components/DocTag.jsx';
-import ReorderPanel from '../../components/ReorderPanel.jsx';
+import DropdownMenu, { DropdownMenuItem } from '../../components/DropdownMenu.jsx';
+import PODialog from '../../components/procurement/PODialog.jsx';
+import ReorderAssistanceDialog from '../../components/procurement/ReorderAssistanceDialog.jsx';
+import CreatePoQuick from '../../components/modals/CreatePoQuick.jsx';
 import { purchaseOrders as allPOs, suppliers as allSuppliers } from '../../data/mockProcurement.js';
 import { exportToCSV } from '../../utils/csvUtils.js';
 import { useApp } from '../../context/AppContext.jsx';
@@ -23,9 +24,11 @@ export default function PurchaseOrders() {
   const [status, setStatus] = useState('');
   const [site, setSite] = useState('');
   const [page, setPage] = useState(0);
-  const [viewing, setViewing] = useState(null);
-  const [editing, setEditing] = useState(null);
+  const [poDialog, setPoDialog] = useState({ open: false, poId: null, mode: 'view' });
   const [reorderOpen, setReorderOpen] = useState(false);
+  const [createPOOpen, setCreatePOOpen] = useState(false);
+  const [prefilledLines, setPrefilledLines] = useState(null);
+  const newPOButtonRef = useRef(null);
   const pageSize = 10;
 
   // Safe defaults
@@ -64,10 +67,30 @@ export default function PurchaseOrders() {
     { key: 'value', label: 'Value', render: (r) => formatCurrency(r.value || 0, settings.currency) },
     { key: 'docs', label: 'Docs', render: (r) => (r.docs || []).map(d => <DocTag key={d.id} tag={d.tag} />) },
     { key: 'actions', label: '', render: (r) => (
-      <div className="flex gap-2">
-        <button className="btn" title="View" onClick={() => setViewing(r)}>View</button>
-        <button className="btn" title="Edit" onClick={() => setEditing(r)}>Edit</button>
-      </div>
+      <DropdownMenu>
+        {({ close }) => (
+          <>
+            <DropdownMenuItem 
+              icon={Eye} 
+              onClick={() => {
+                setPoDialog({ open: true, poId: r.id, mode: 'view' });
+                close();
+              }}
+            >
+              View
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              icon={Edit} 
+              onClick={() => {
+                setPoDialog({ open: true, poId: r.id, mode: 'edit' });
+                close();
+              }}
+            >
+              Edit
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenu>
     ) },
   ];
 
@@ -93,7 +116,17 @@ export default function PurchaseOrders() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 h-4 w-4" />
             <input className="w-full sm:w-64 pl-9 pr-3 py-1.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Search..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }} />
           </div>
-          <button className="btn" onClick={() => toast('New PO (mock)')}> <Plus size={16} /> <span className="hidden sm:inline">New PO</span></button>
+          <button 
+            ref={newPOButtonRef}
+            className="btn" 
+            onClick={() => {
+              setPrefilledLines(null);
+              setCreatePOOpen(true);
+            }}
+          > 
+            <Plus size={16} /> 
+            <span className="hidden sm:inline">New PO</span>
+          </button>
           <button className="btn" onClick={() => setReorderOpen(true)}>Reorder Assistant</button>
           <button className="btn" onClick={handleExport}>Export CSV</button>
         </div>
@@ -101,19 +134,32 @@ export default function PurchaseOrders() {
 
       <TableCard title="Purchase Orders" columns={columns} rows={paged} />
 
-      <ViewDrawer open={!!viewing} onClose={() => setViewing(null)} title="PO Details">
-        {viewing && (
-          <div className="space-y-2 text-sm">
-            <div><span className="text-zinc-400">PO:</span> {viewing.id}</div>
-            <div><span className="text-zinc-400">Supplier:</span> {viewing.supplier}</div>
-            <div><span className="text-zinc-400">Order Date:</span> {viewing.orderDate}</div>
-            <div><span className="text-zinc-400">Due:</span> {viewing.expectedDate}</div>
-            <div className="mt-2"><span className="text-zinc-400">Docs:</span> {(viewing.docs || []).map((d) => <DocTag key={d.id} tag={d.tag} />)}</div>
-          </div>
-        )}
-      </ViewDrawer>
-      <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit PO" />
-      <ReorderPanel open={reorderOpen} onClose={() => setReorderOpen(false)} onCreateDraft={(rows) => { toast(`Draft PO with ${rows.length} lines created (mock)`); }} />
+      <PODialog 
+        open={poDialog.open} 
+        onClose={() => setPoDialog({ open: false, poId: null, mode: 'view' })} 
+        poId={poDialog.poId}
+        mode={poDialog.mode}
+      />
+      
+      <CreatePoQuick 
+        open={createPOOpen} 
+        onClose={() => {
+          setCreatePOOpen(false);
+          setPrefilledLines(null);
+        }} 
+        triggerRef={newPOButtonRef}
+        prefilledLines={prefilledLines}
+      />
+      
+      <ReorderAssistanceDialog 
+        open={reorderOpen} 
+        onClose={() => setReorderOpen(false)} 
+        onGeneratePO={(lines) => {
+          setPrefilledLines(lines);
+          setReorderOpen(false);
+          setCreatePOOpen(true);
+        }} 
+      />
 
       <div className="flex items-center justify-between text-sm text-zinc-400">
         <span>Page {page + 1} of {pageCount}</span>

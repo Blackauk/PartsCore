@@ -27,8 +27,12 @@ export default function DropdownMenu({ children, trigger }) {
   }, [open]);
 
   return (
-    <div className="relative" ref={ref}>
-      {trigger || (
+    <div className="relative inline-block" ref={ref}>
+      {trigger ? (
+        <div onClick={() => setOpen(!open)}>
+          {trigger}
+        </div>
+      ) : (
         <button
           className="btn btn-xs"
           onClick={() => setOpen(!open)}

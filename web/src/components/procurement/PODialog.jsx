@@ -20,7 +20,18 @@ export default function PODialog({ open, onClose, poId, mode = 'view' }) {
     return data;
   }, [poId]);
 
-  if (!open || !po) return null;
+  if (!open) return null;
+  
+  if (!po) {
+    return (
+      <ModalRoot open={open} onClose={onClose} title="Purchase Order Not Found" maxWidth="max-w-md">
+        <div className="text-center py-4">
+          <p className="text-sm text-zinc-400">Purchase order {poId} could not be found.</p>
+          <button className="btn mt-4" onClick={onClose}>Close</button>
+        </div>
+      </ModalRoot>
+    );
+  }
 
   const isReadOnly = mode === 'view';
 
