@@ -167,6 +167,7 @@ export default function CommandCenter() {
           title="My Tasks" 
           collapsible 
           storageKey="dashboard-panel-my-tasks"
+          testId="dashboard-panel-my-tasks"
         >
           <TasksList tasks={data.tasks} />
         </Card>
@@ -174,10 +175,14 @@ export default function CommandCenter() {
           title="Stock Alerts (Below ROP)" 
           collapsible 
           storageKey="dashboard-panel-stock-alerts"
+          testId="dashboard-panel-stock-alerts"
         >
           <TableMini columns={alertsCols} rows={data.stockAlerts} />
         </Card>
-        <Card title="Quick Access">
+        <Card 
+          title="Quick Access"
+          testId="dashboard-panel-quick-access"
+        >
           <QuickButtons onOpenCreatePO={(triggerRef) => setPoModal({ open: true, part: null, site: null, triggerRef })} />
         </Card>
       </div>
@@ -187,6 +192,7 @@ export default function CommandCenter() {
           title="Upcoming Deliveries (7d)" 
           collapsible 
           storageKey="dashboard-panel-pending-deliveries"
+          testId="dashboard-panel-upcoming-deliveries"
         >
           <TableMini columns={upcomingCols} rows={enrichedUpcoming} />
         </Card>
@@ -194,6 +200,7 @@ export default function CommandCenter() {
           title="Overdue Deliveries" 
           collapsible 
           storageKey="dashboard-panel-overdue-deliveries"
+          testId="dashboard-panel-overdue-deliveries"
         >
           <TableMini columns={overdueCols} rows={enrichedOverdue} />
         </Card>
@@ -205,6 +212,7 @@ export default function CommandCenter() {
           action={<Link className="link" to="/reports/transactions">View all</Link>}
           collapsible 
           storageKey="dashboard-panel-recent-movements"
+          testId="dashboard-panel-recent-movements"
         >
           <RecentFeed items={data.recentMovements} />
         </Card>
@@ -212,6 +220,7 @@ export default function CommandCenter() {
           title="Top 10 Used Parts (30d)" 
           collapsible 
           storageKey="dashboard-panel-top-used-parts"
+          testId="dashboard-panel-top-used-parts"
         >
           <TopUsedChart data={data.topUsedParts30d} />
         </Card>

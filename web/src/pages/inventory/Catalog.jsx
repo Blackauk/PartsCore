@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { Search, ShoppingCart, Grid, List, GripVertical, CheckSquare, Square, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { catalogueItems, stockStatus } from '../../data/catalogueData.js';
@@ -50,11 +50,9 @@ export default function Catalog() {
   const prevFiltersRef = useRef({ search: '', selectedEquipment: [], stockFilter: 'all' });
   const debounceTimerRef = useRef(null);
 
-  // Mount/unmount logging for debugging
+  // Cleanup on unmount
   useEffect(() => {
-    console.debug('[Inventory/Catalog] mounted');
     return () => {
-      console.debug('[Inventory/Catalog] unmounted');
       // Cleanup: abort any pending requests
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -86,21 +84,14 @@ export default function Catalog() {
     return mergeCatalogueWithStock(catalogueItems, stockStatus);
   }, []);
 
-  // Apply filters with effect guard to prevent unnecessary recalculations
+  // Stabilize selectedEquipment for comparison - use sorted string representation
+  const selectedEquipmentKey = useMemo(() => 
+    [...selectedEquipment].sort().join(','),
+    [selectedEquipment]
+  );
+
+  // Apply filters - simplified without complex comparison logic
   const filtered = useMemo(() => {
-    const currentFilters = { search: debouncedSearch, selectedEquipment, stockFilter };
-    const filtersChanged = 
-      prevFiltersRef.current.search !== debouncedSearch ||
-      prevFiltersRef.current.selectedEquipment.length !== selectedEquipment.length ||
-      prevFiltersRef.current.selectedEquipment.some((eq, i) => selectedEquipment[i] !== eq) ||
-      prevFiltersRef.current.stockFilter !== stockFilter;
-    
-    if (!filtersChanged && prevFiltersRef.current.catalogWithStock === catalogWithStock) {
-      return prevFiltersRef.current.filtered || [];
-    }
-    
-    prevFiltersRef.current = { ...currentFilters, catalogWithStock };
-    
     let result = catalogWithStock;
     
     // Search filter
@@ -130,24 +121,27 @@ export default function Catalog() {
       });
     }
     
-    prevFiltersRef.current.filtered = result;
     return result;
-  }, [debouncedSearch, selectedEquipment, stockFilter, catalogWithStock]);
+  }, [debouncedSearch, selectedEquipmentKey, stockFilter, catalogWithStock]);
+
+  // Create Set for faster cart lookup
+  const cartSkuSet = useMemo(() => new Set(cart.map(i => i.sku)), [cart]);
 
   // Pagination
   const start = page * pageSize;
   const paged = filtered.slice(start, start + pageSize);
   const pageCount = Math.ceil(filtered.length / pageSize) || 1;
 
-  // Toggle equipment filter
-  const toggleEquipment = (equipment) => {
-    setSelectedEquipment(prev => 
-      prev.includes(equipment)
+  // Toggle equipment filter - use functional update to stabilize
+  const toggleEquipment = useCallback((equipment) => {
+    setSelectedEquipment(prev => {
+      const newEquipment = prev.includes(equipment)
         ? prev.filter(e => e !== equipment)
-        : [...prev, equipment]
-    );
+        : [...prev, equipment];
+      return newEquipment;
+    });
     setPage(0);
-  };
+  }, []);
 
   // Toggle selection
   const toggleSelection = useCallback((sku) => {
@@ -162,27 +156,37 @@ export default function Catalog() {
     });
   }, []);
 
-  // Toggle all selection
+  // Toggle all selection - stabilize dependencies
   const toggleAllSelection = useCallback(() => {
-    if (selected.size === paged.length) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(paged.map(item => item.sku)));
-    }
-  }, [selected, paged]);
-
-  // Add selected to cart
-  const handleAddToCart = useCallback(() => {
-    const toAdd = paged.filter(item => selected.has(item.sku));
-    const newCart = [...cart];
-    toAdd.forEach(item => {
-      if (!newCart.find(i => i.sku === item.sku)) {
-        newCart.push({ ...item, qty: 0, orderNotes: '' });
+    setSelected(prev => {
+      const currentPageSkus = new Set(paged.map(item => item.sku));
+      const allSelected = currentPageSkus.size > 0 && 
+        Array.from(currentPageSkus).every(sku => prev.has(sku));
+      
+      if (allSelected) {
+        return new Set();
+      } else {
+        return new Set(currentPageSkus);
       }
     });
-    setCart(newCart);
-    setSelected(new Set());
-  }, [selected, cart, paged]);
+  }, [paged]);
+
+  // Add selected to cart - use functional updates to avoid dependencies
+  const handleAddToCart = useCallback(() => {
+    setCart(prevCart => {
+      const newCart = [...prevCart];
+      setSelected(prevSelected => {
+        const toAdd = paged.filter(item => prevSelected.has(item.sku));
+        toAdd.forEach(item => {
+          if (!newCart.find(i => i.sku === item.sku)) {
+            newCart.push({ ...item, qty: 0, orderNotes: '' });
+          }
+        });
+        return new Set();
+      });
+      return newCart;
+    });
+  }, [paged]);
 
   // Update cart item
   const handleUpdateCart = useCallback((sku, updates) => {
@@ -217,11 +221,14 @@ export default function Catalog() {
   }, []);
 
   const handleAddToBatchFromDetail = useCallback((item) => {
-    if (!cart.find(i => i.sku === item.sku)) {
-      setCart([...cart, item]);
-      toast('Added to batch order', 'success');
-    }
-  }, [cart, toast]);
+    setCart(prevCart => {
+      if (!prevCart.find(i => i.sku === item.sku)) {
+        toast('Added to batch order', 'success');
+        return [...prevCart, item];
+      }
+      return prevCart;
+    });
+  }, [toast]);
 
   const handleCreateDraftPOFromDetail = useCallback((item, qty) => {
     navigate(`/procurement/purchase-orders/new?sku=${item.sku}&qty=${qty}&supplier=${encodeURIComponent(item.preferredSupplierId || item.supplier || '')}`);
@@ -375,7 +382,7 @@ export default function Catalog() {
                   const status = getStockStatus(item.onHand, item.minQty);
                   const statusColor = getStockStatusColor(status);
                   const isSelected = selected.has(item.sku);
-                  const isInCart = cart.find(i => i.sku === item.sku);
+                  const isInCart = cartSkuSet.has(item.sku);
                   
                   return (
                     <tr 
@@ -452,7 +459,7 @@ export default function Catalog() {
           {paged.map(item => {
             const status = getStockStatus(item.onHand, item.minQty);
             const statusColor = getStockStatusColor(status);
-            const isInCart = cart.find(i => i.sku === item.sku);
+            const isInCart = cartSkuSet.has(item.sku);
             
             return (
               <div 
@@ -491,9 +498,12 @@ export default function Catalog() {
                 </div>
                 <button
                   onClick={() => {
-                    if (!cart.find(i => i.sku === item.sku)) {
-                      setCart([...cart, { ...item, qty: 0, orderNotes: '' }]);
-                    }
+                    setCart(prevCart => {
+                      if (!prevCart.find(i => i.sku === item.sku)) {
+                        return [...prevCart, { ...item, qty: 0, orderNotes: '' }];
+                      }
+                      return prevCart;
+                    });
                   }}
                   className="btn-secondary w-full text-sm"
                   disabled={!!isInCart}

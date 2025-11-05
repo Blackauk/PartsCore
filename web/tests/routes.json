@@ -1,0 +1,24 @@
+[
+  "/dashboard",
+  "/inventory/items",
+  "/inventory/catalog",
+  "/inventory/master-list",
+  "/inventory/low-stock",
+  "/inventory/fast-movers",
+  "/procurement/purchase-orders",
+  "/procurement/deliveries",
+  "/procurement/deliveries/pending",
+  "/procurement/returns",
+  "/procurement/suppliers",
+  "/movements",
+  "/movements/issue",
+  "/movements/transfer",
+  "/movements/adjust",
+  "/reports/analytics",
+  "/reports/transactions",
+  "/locations",
+  "/labels",
+  "/help",
+  "/feedback"
+]
+

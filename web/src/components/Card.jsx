@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useCollapsiblePanel } from '../hooks/useCollapsiblePanel.js';
 
-export default function Card({ title, action, children, collapsible, storageKey }) {
+export default function Card({ title, action, children, collapsible, storageKey, testId }) {
   const [isExpanded, toggle] = useCollapsiblePanel(
     collapsible && storageKey ? storageKey : null,
     true
@@ -10,7 +10,7 @@ export default function Card({ title, action, children, collapsible, storageKey 
   const showContent = !collapsible || isExpanded;
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 shadow-sm">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 shadow-sm" data-testid={testId}>
       <div 
         className={`p-3 border-b border-zinc-800 flex items-center justify-between ${
           collapsible ? 'cursor-pointer hover:bg-zinc-900/50 transition-colors' : ''
