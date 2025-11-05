@@ -19,7 +19,7 @@ export default function CommandCenter() {
   const currentUser = useAuthStore((s) => s.currentUser);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [loading, setLoading] = useState(false);
-  const [poModal, setPoModal] = useState({ open: false, part: null, site: null });
+  const [poModal, setPoModal] = useState({ open: false, part: null, site: null, triggerRef: null });
   const [chaseDisabled, setChaseDisabled] = useState(new Set());
 
   function refresh() {
@@ -132,7 +132,14 @@ export default function CommandCenter() {
     { key: 'site', label: 'Site' },
     { key: 'onHand', label: 'Qty on Hand' },
     { key: 'minStock', label: 'Min Stock' },
-    { key: 'act', label: '', render: (r) => <button className="btn btn-xs" onClick={()=>setPoModal({ open: true, part: r.part, site: r.site })}>Create PO</button> },
+    { key: 'act', label: '', render: (r) => (
+      <button 
+        className="btn btn-xs" 
+        onClick={()=>setPoModal({ open: true, part: r.part, site: r.site, triggerRef: null })}
+      >
+        Create PO
+      </button>
+    ) },
   ];
 
   return (
@@ -156,36 +163,67 @@ export default function CommandCenter() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <Card title="My Tasks">
+        <Card 
+          title="My Tasks" 
+          collapsible 
+          storageKey="dashboard-panel-my-tasks"
+        >
           <TasksList tasks={data.tasks} />
         </Card>
-        <Card title="Stock Alerts (Below ROP)">
+        <Card 
+          title="Stock Alerts (Below ROP)" 
+          collapsible 
+          storageKey="dashboard-panel-stock-alerts"
+        >
           <TableMini columns={alertsCols} rows={data.stockAlerts} />
         </Card>
         <Card title="Quick Access">
-          <QuickButtons />
+          <QuickButtons onOpenCreatePO={(triggerRef) => setPoModal({ open: true, part: null, site: null, triggerRef })} />
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <Card title="Upcoming Deliveries (7d)">
+        <Card 
+          title="Upcoming Deliveries (7d)" 
+          collapsible 
+          storageKey="dashboard-panel-pending-deliveries"
+        >
           <TableMini columns={upcomingCols} rows={enrichedUpcoming} />
         </Card>
-        <Card title="Overdue Deliveries">
+        <Card 
+          title="Overdue Deliveries" 
+          collapsible 
+          storageKey="dashboard-panel-overdue-deliveries"
+        >
           <TableMini columns={overdueCols} rows={enrichedOverdue} />
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <Card title="Recent Stock Movements" action={<Link className="link" to="/reports/transactions">View all</Link>}>
+        <Card 
+          title="Recent Stock Movements" 
+          action={<Link className="link" to="/reports/transactions">View all</Link>}
+          collapsible 
+          storageKey="dashboard-panel-recent-movements"
+        >
           <RecentFeed items={data.recentMovements} />
         </Card>
-        <Card title="Top 10 Used Parts (30d)">
+        <Card 
+          title="Top 10 Used Parts (30d)" 
+          collapsible 
+          storageKey="dashboard-panel-top-used-parts"
+        >
           <TopUsedChart data={data.topUsedParts30d} />
         </Card>
       </div>
 
-      <CreatePoQuick open={poModal.open} part={poModal.part} site={poModal.site} onClose={()=>setPoModal({ open:false, part:null, site:null })} />
+      <CreatePoQuick 
+        open={poModal.open} 
+        part={poModal.part} 
+        site={poModal.site} 
+        triggerRef={poModal.triggerRef}
+        onClose={()=>setPoModal({ open:false, part:null, site:null, triggerRef:null })} 
+      />
     </div>
   );
 }
