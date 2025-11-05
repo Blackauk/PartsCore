@@ -134,26 +134,30 @@ export default function TableCard({
                 </td>
               </tr>
             ) : (
-              rows.map((r, i) => (
-                <tr 
-                  key={i} 
-                  className="border-t table-row-hover"
-                  style={{ 
-                    borderColor: 'var(--border-color)',
-                    transition: 'background-color 0.2s ease'
-                  }}
-                >
-                  {columns.map((c) => (
-                    <td 
-                      key={c.key} 
-                      className="px-4 py-3 text-center"
-                      style={{ color: 'var(--text-primary)' }}
-                    >
-                      {c.render ? c.render(r) : (r[c.key] ?? '')}
-                    </td>
-                  ))}
-                </tr>
-              ))
+              rows.map((r, i) => {
+                // Use stable key: prefer id, sku, or a unique identifier, fallback to index
+                const rowKey = r.id || r.sku || r.key || `row-${i}`;
+                return (
+                  <tr 
+                    key={rowKey} 
+                    className="border-t table-row-hover"
+                    style={{ 
+                      borderColor: 'var(--border-color)',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                  >
+                    {columns.map((c) => (
+                      <td 
+                        key={c.key} 
+                        className="px-4 py-3 text-center"
+                        style={{ color: 'var(--text-primary)' }}
+                      >
+                        {c.render ? c.render(r) : (r[c.key] ?? '')}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

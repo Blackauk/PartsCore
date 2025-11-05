@@ -64,12 +64,14 @@ export default function Items() {
   
   // Refs for effect guards and abort controller
   const abortControllerRef = useRef(null);
-  const prevFiltersRef = useRef({ search: '', category: '' });
   const debounceTimerRef = useRef(null);
+  const mountedRef = useRef(true);
 
   // Cleanup on unmount
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       // Cleanup: abort any pending requests
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -80,7 +82,7 @@ export default function Items() {
     };
   }, []);
 
-  // Debounce search input (250ms)
+  // Debounce search input (300ms)
   useEffect(() => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -88,7 +90,7 @@ export default function Items() {
     debounceTimerRef.current = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(0); // Reset to first page on search change
-    }, 250);
+    }, 300);
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
@@ -109,12 +111,12 @@ export default function Items() {
     setLoading(true);
     const timer = setTimeout(() => {
       try {
-        if (!signal.aborted) {
+        if (!signal.aborted && mountedRef.current) {
           setLoading(false);
           setError(null);
         }
       } catch (err) {
-        if (!signal.aborted) {
+        if (!signal.aborted && mountedRef.current) {
           setError('Failed to load inventory items');
           setLoading(false);
         }
@@ -131,29 +133,24 @@ export default function Items() {
 
   const items = useMemo(() => allItems || [], []);
   
-  // Filter with effect guard to prevent unnecessary recalculations
+  // Filter items - simplified memoization
   const filtered = useMemo(() => {
-    const currentFilters = { search: debouncedSearch, category };
-    const filtersChanged = 
-      prevFiltersRef.current.search !== debouncedSearch ||
-      prevFiltersRef.current.category !== category;
-    
-    if (!filtersChanged && prevFiltersRef.current.items === items) {
-      return prevFiltersRef.current.filtered || [];
-    }
-    
-    prevFiltersRef.current = { search: debouncedSearch, category, items };
-    
-    const result = items.filter((r) =>
-      (!category || r.category === category) && (
-        debouncedSearch === '' ||
-        (r.sku || '').toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        (r.name || '').toLowerCase().includes(debouncedSearch.toLowerCase())
-      )
-    );
-    
-    prevFiltersRef.current.filtered = result;
-    return result;
+    return items.filter((r) => {
+      // Category filter
+      if (category && r.category !== category) {
+        return false;
+      }
+      // Search filter
+      if (debouncedSearch) {
+        const searchLower = debouncedSearch.toLowerCase();
+        const matchesSku = (r.sku || '').toLowerCase().includes(searchLower);
+        const matchesName = (r.name || '').toLowerCase().includes(searchLower);
+        if (!matchesSku && !matchesName) {
+          return false;
+        }
+      }
+      return true;
+    });
   }, [debouncedSearch, category, items]);
 
   const start = page * pageSize;
@@ -231,7 +228,7 @@ export default function Items() {
         ))}
       </select>
       <div className="relative flex-1 sm:flex-initial">
-        <label htmlFor="items-search-input" className="sr-only">Search items</label>
+        <label htmlFor="items-search-input" className="sr-only">Search stock</label>
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary h-4 w-4 pointer-events-none" />
         <input
           id="items-search-input"
@@ -262,7 +259,7 @@ export default function Items() {
   return (
     <div className="space-y-3">
       <TableCard columns={columns} rows={paged} isLoading={loading} error={error} onRetry={handleRetry} />
-      <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit Item" />
+      <EditModal open={!!editing} onClose={() => setEditing(null)} row={editing} title="Edit Stock Item" />
       <CSVModal
         open={importOpen}
         onClose={() => setImportOpen(false)}
