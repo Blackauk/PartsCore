@@ -32,6 +32,7 @@ import CatalogSkeleton from './pages/inventory/CatalogSkeleton.jsx';
 import LowStock from './pages/inventory/LowStock.jsx';
 import FastMovers from './pages/inventory/FastMovers.jsx';
 import MasterList from './pages/inventory/MasterList.jsx';
+import NewItem from './pages/inventory/NewItem.jsx';
 
 // Locations sub-pages
 import SitesPage from './pages/locations/Sites.jsx';
@@ -45,8 +46,10 @@ import Deliveries from './pages/procurement/Deliveries.jsx';
 import PendingDeliveries from './pages/procurement/deliveries/Pending.jsx';
 import GrnHistory from './pages/procurement/deliveries/GrnHistory.jsx';
 import GrnDetail from './pages/procurement/deliveries/GrnDetail.jsx';
+import ReceiveDelivery from './pages/procurement/deliveries/ReceiveDelivery.jsx';
 import Returns from './pages/procurement/Returns.jsx';
 import Suppliers from './pages/procurement/Suppliers.jsx';
+import NewPO from './pages/procurement/NewPO.jsx';
 
 // Reports sub-pages
 import Analytics from './pages/reports/Analytics.jsx';
@@ -100,6 +103,7 @@ export default function AppRoutes() {
                     <Route path="master-list" element={<MasterList key="master-list" />} />
                     <Route path="master" element={<Navigate to="/inventory/master-list" replace />} />
                     <Route path="items" element={<Items key="items" />} />
+                    <Route path="new-item" element={<NewItem key="new-item" />} />
                     <Route 
                       path="catalog" 
                       element={
@@ -129,6 +133,7 @@ export default function AppRoutes() {
 
                   <Route path="/procurement" element={<Procurement />}>
                     <Route index element={<PurchaseOrders />} />
+                    <Route path="new-po" element={<NewPO key="new-po" />} />
                     <Route path="purchase-orders/:poId" element={<PODetail />} />
                     <Route path="deliveries" element={<Deliveries />} >
                       <Route index element={<GrnHistory />} />
@@ -139,6 +144,9 @@ export default function AppRoutes() {
                     <Route path="returns" element={<Returns />} />
                     <Route path="suppliers" element={<Suppliers />} />
                   </Route>
+
+                  {/* Standalone deliveries route for receive delivery */}
+                  <Route path="/deliveries/receive-delivery" element={<ReceiveDelivery key="receive-delivery" />} />
 
                   <Route path="/reports" element={<Reports />}>
                     <Route index element={<Analytics />} />

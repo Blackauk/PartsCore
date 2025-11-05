@@ -31,9 +31,9 @@ export default function Topbar({ onHamburger }) {
   }, [newMenuOpen]);
 
   const newActions = [
-    { label: 'New Item', icon: Package, action: () => navigate('/inventory') },
-    { label: 'New PO', icon: FileText, action: () => navigate('/procurement') },
-    { label: 'Receive Delivery', icon: Truck, action: () => navigate('/movements') },
+    { label: 'New Item', icon: Package, action: () => navigate('/inventory/new-item') },
+    { label: 'New PO', icon: FileText, action: () => navigate('/procurement/new-po') },
+    { label: 'Receive Delivery', icon: Truck, action: () => navigate('/deliveries/receive-delivery') },
   ];
 
   return (
