@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Suspense } from 'react';
 import AppShell from './components/AppShell.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Dashboard from './pages/dashboard/index.jsx';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 
 // Auth pages
 import LoginPage from './pages/auth/LoginPage.jsx';
@@ -26,6 +28,7 @@ import Adjust from './pages/movements/Adjust.jsx';
 // Inventory sub-pages
 import Items from './pages/inventory/Items.jsx';
 import Catalog from './pages/inventory/Catalog.jsx';
+import CatalogSkeleton from './pages/inventory/CatalogSkeleton.jsx';
 import LowStock from './pages/inventory/LowStock.jsx';
 import FastMovers from './pages/inventory/FastMovers.jsx';
 import MasterList from './pages/inventory/MasterList.jsx';
@@ -97,7 +100,16 @@ export default function AppRoutes() {
                     <Route path="master-list" element={<MasterList key="master-list" />} />
                     <Route path="master" element={<Navigate to="/inventory/master-list" replace />} />
                     <Route path="items" element={<Items key="items" />} />
-                    <Route path="catalog" element={<Catalog key="catalog" />} />
+                    <Route 
+                      path="catalog" 
+                      element={
+                        <ErrorBoundary>
+                          <Suspense fallback={<CatalogSkeleton />}>
+                            <Catalog key="catalog" />
+                          </Suspense>
+                        </ErrorBoundary>
+                      } 
+                    />
                     <Route path="low-stock" element={<LowStock key="low-stock" />} />
                     <Route path="fast-movers" element={<FastMovers key="fast-movers" />} />
                     <Route path="movements" element={<Navigate to="/movements" replace />} />

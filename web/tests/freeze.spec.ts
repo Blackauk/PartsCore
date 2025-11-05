@@ -98,6 +98,65 @@ test.describe('Freeze Detection', () => {
     });
   }
 
+  // Items → Catalog freeze regression test
+  test('Items → Catalog navigation regression', async ({ page }) => {
+    const itemsRoute = allRoutes.find(r => r.includes('/inventory/items') || r === '/inventory/items');
+    const catalogRoute = allRoutes.find(r => r.includes('/inventory/catalog') || r === '/inventory/catalog');
+    
+    if (!itemsRoute || !catalogRoute) {
+      test.skip();
+      return;
+    }
+    
+    console.log(`\n🔍 Items → Catalog freeze regression test\n`);
+    
+    // Navigate to Items first
+    await page.goto(`${BASE_URL}${itemsRoute}`, { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle', { timeout: 8000 });
+    await page.waitForTimeout(1000);
+    
+    // Rapidly navigate Items → Catalog 5 times
+    for (let i = 0; i < 5; i++) {
+      const startTime = Date.now();
+      
+      // Navigate to Catalog
+      await page.goto(`${BASE_URL}${catalogRoute}`, { waitUntil: 'domcontentloaded', timeout: 10000 });
+      
+      // Wait for content to render (check for table or cards)
+      await page.waitForSelector('table, [data-testid*="catalog"], .card', { timeout: 5000 }).catch(() => {
+        // Fallback: wait for any content
+        return page.waitForSelector('main, [role="main"]', { timeout: 5000 });
+      });
+      
+      const navTime = Date.now() - startTime;
+      
+      // Verify page is responsive (no freeze)
+      const isResponsive = await page.evaluate(() => {
+        return document.readyState === 'complete' && 
+               !document.querySelector('[data-loading]') &&
+               document.querySelector('table, .card, main');
+      });
+      
+      expect(isResponsive, `Catalog should render on attempt ${i + 1}`).toBe(true);
+      expect(navTime, `Navigation should complete within 10s (took ${navTime}ms)`).toBeLessThan(10000);
+      
+      // Check for console errors
+      const errors = await page.evaluate(() => {
+        return (window as any).__consoleErrors || [];
+      });
+      
+      expect(errors.length, `No console errors on attempt ${i + 1}`).toBe(0);
+      
+      // Navigate back to Items
+      await page.goto(`${BASE_URL}${itemsRoute}`, { waitUntil: 'domcontentloaded', timeout: 8000 });
+      await page.waitForTimeout(500);
+      
+      console.log(`  ✓ Attempt ${i + 1}/5: ${navTime}ms`);
+    }
+    
+    console.log(`  ✔ Items → Catalog regression test passed\n`);
+  });
+
   // Back-and-forth stress test
   test('Back-and-forth navigation stress test', async ({ page }) => {
     if (allRoutes.length < 2) {

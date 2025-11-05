@@ -27,6 +27,17 @@ export default function Catalog() {
   const navigate = useNavigate();
   const { toast } = useApp();
   
+  // Diagnostics: render counter (temporary)
+  const renderCountRef = useRef(0);
+  renderCountRef.current += 1;
+  if (renderCountRef.current === 1) {
+    console.log('[Catalog] Component mounted');
+    performance.mark('catalog-mount-start');
+  }
+  if (renderCountRef.current > 10) {
+    console.warn(`[Catalog] High render count: ${renderCountRef.current}`);
+  }
+  
   // Filters
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -79,9 +90,23 @@ export default function Catalog() {
     };
   }, [search]);
 
-  // Merge catalog with stock
+  // Merge catalog with stock - memoize to prevent recalculation
   const catalogWithStock = useMemo(() => {
-    return mergeCatalogueWithStock(catalogueItems, stockStatus);
+    performance.mark('catalog-merge-start');
+    const result = mergeCatalogueWithStock(catalogueItems, stockStatus);
+    performance.mark('catalog-merge-end');
+    performance.measure('catalog-merge', 'catalog-merge-start', 'catalog-merge-end');
+    return result;
+  }, []);
+  
+  // Track when mount completes
+  useEffect(() => {
+    if (renderCountRef.current === 1) {
+      performance.mark('catalog-mount-end');
+      performance.measure('catalog-mount', 'catalog-mount-start', 'catalog-mount-end');
+      const measure = performance.getEntriesByName('catalog-mount')[0];
+      console.log(`[Catalog] Mount complete in ${measure.duration.toFixed(2)}ms`);
+    }
   }, []);
 
   // Stabilize selectedEquipment for comparison - use sorted string representation
@@ -127,10 +152,13 @@ export default function Catalog() {
   // Create Set for faster cart lookup
   const cartSkuSet = useMemo(() => new Set(cart.map(i => i.sku)), [cart]);
 
-  // Pagination
-  const start = page * pageSize;
-  const paged = filtered.slice(start, start + pageSize);
-  const pageCount = Math.ceil(filtered.length / pageSize) || 1;
+  // Memoize pagination calculations
+  const pageCount = useMemo(() => Math.ceil(filtered.length / pageSize) || 1, [filtered.length, pageSize]);
+  const start = useMemo(() => page * pageSize, [page, pageSize]);
+  const paged = useMemo(() => filtered.slice(start, start + pageSize), [filtered, start, pageSize]);
+  
+  // Memoize current page SKUs for toggleAllSelection
+  const currentPageSkus = useMemo(() => new Set(paged.map(item => item.sku)), [paged]);
 
   // Toggle equipment filter - use functional update to stabilize
   const toggleEquipment = useCallback((equipment) => {
@@ -156,10 +184,9 @@ export default function Catalog() {
     });
   }, []);
 
-  // Toggle all selection - stabilize dependencies
+  // Toggle all selection - use memoized currentPageSkus
   const toggleAllSelection = useCallback(() => {
     setSelected(prev => {
-      const currentPageSkus = new Set(paged.map(item => item.sku));
       const allSelected = currentPageSkus.size > 0 && 
         Array.from(currentPageSkus).every(sku => prev.has(sku));
       
@@ -169,7 +196,7 @@ export default function Catalog() {
         return new Set(currentPageSkus);
       }
     });
-  }, [paged]);
+  }, [currentPageSkus]);
 
   // Add selected to cart - use functional updates to avoid dependencies
   const handleAddToCart = useCallback(() => {
